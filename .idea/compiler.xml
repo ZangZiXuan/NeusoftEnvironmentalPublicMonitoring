@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="NEPM" />
+        <module name="NEPV" />
+        <module name="NEPG" />
+        <module name="NEPS" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="NEPG" target="17" />
+      <module name="NEPM" target="17" />
+      <module name="NEPS" target="17" />
+      <module name="NEPV" target="17" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="NEPG" options="-parameters" />
+      <module name="NEPM" options="-parameters" />
+      <module name="NEPS" options="-parameters" />
+      <module name="NEPV" options="-parameters" />
+    </option>
+  </component>
+</project>
