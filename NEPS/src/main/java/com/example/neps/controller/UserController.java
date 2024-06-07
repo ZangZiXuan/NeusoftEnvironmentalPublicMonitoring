@@ -5,6 +5,7 @@ import com.example.neps.dao.entity.User;
 import com.example.neps.mapper.UserMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
@@ -49,21 +50,24 @@ public class UserController {
 
 
     @GetMapping("/loginUser")
-    public Map<String,Object> loginChild(@RequestParam("phone") String phone,
-                                         @RequestParam("password") String password){
+    public ResponseEntity<Map<String, Object>> loginChild(@RequestParam("phone") String phone,
+                                                          @RequestParam("password") String password){
         Map<String,Object> response = new HashMap<>();
         //将输入的数据与数据库进行匹配，看是否存在
         User hasUser = userMapper.selectOne(Wrappers.<User>lambdaQuery().eq(User::getPhone, phone)
                 .eq(User::getPassword, password));
         if (hasUser == null) {
-            response.put("success:",false);
-            response.put("data:",null);
+            response.put("success",false);
+            response.put("data",null);
             response.put("message","登录失败，用户名与密码不匹配");
+            //返回 400 Bad Request 表示请求不合法.(待推敲哪个状态码更合适)
+            return ResponseEntity.badRequest().body(response);
+
         } else {
-            response.put("success:",true);
-            response.put("data:",hasUser);
+            response.put("success",true);
+            response.put("data",hasUser);
             response.put("message","登录成功");
+            return ResponseEntity.ok(response);
         }
-        return response;
     }
 }
