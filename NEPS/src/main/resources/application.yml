@@ -1,14 +1,10 @@
-# 数据库连接配置
 spring:
   datasource:
+    url: jdbc:mysql://localhost:3306/environmental?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
     username: root
     password: root
-    url: jdbc:mysql://localhost:3306/environmental?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
-
-    #Spring Boot 默认是不注入这些属性值的，需要自己绑定
-    #druid 数据源专有配置
     initialSize: 5
     minIdle: 5
     maxActive: 20
@@ -20,5 +16,3 @@ spring:
     testOnBorrow: false
     testOnReturn: false
     poolPreparedStatements: true
-
-

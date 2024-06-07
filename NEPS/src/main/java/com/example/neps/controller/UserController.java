@@ -3,10 +3,11 @@ package com.example.neps.controller;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.neps.dao.entity.User;
 import com.example.neps.mapper.UserMapper;
-import jakarta.annotation.Resource;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -17,12 +18,12 @@ import java.util.UUID;
  * @Date 2024/6/6 22:50
  * @Version 1.0
  */
-@Controller
+
 @RestController
 @RequestMapping("/user")
 public class UserController {
-    @Resource
-    private UserMapper userMapper;
+    @Autowired
+    UserMapper userMapper;
     @GetMapping("/creatUser")
     public Map<String,Object> creatUser(@RequestParam("phone") String phone,
                                         @RequestParam("age") Integer age,
@@ -45,7 +46,9 @@ public class UserController {
         }
         return response;
     }
-    @PostMapping("/loginUser")
+
+
+    @GetMapping("/loginUser")
     public Map<String,Object> loginChild(@RequestParam("phone") String phone,
                                          @RequestParam("password") String password){
         Map<String,Object> response = new HashMap<>();

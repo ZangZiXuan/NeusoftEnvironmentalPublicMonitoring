@@ -3,10 +3,7 @@ package com.example.neps.utils;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-/**
- * @author sq ♥ovo♥
- * @date 2023/11/8 - 21:19
- */
+
 public class CommUtil {
     public static String getNowDateLongStr(String dateFormat) {
         // 获取当前日期和时间

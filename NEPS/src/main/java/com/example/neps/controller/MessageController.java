@@ -3,10 +3,11 @@ package com.example.neps.controller;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.neps.dao.entity.Message;
 import com.example.neps.mapper.MessageMapper;
-import jakarta.annotation.Resource;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
+import javax.annotation.Resource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -20,12 +21,13 @@ import java.util.*;
  * @Date 2024/6/7 9:29
  * @Version 1.0
  */
-@Controller
+
 @RestController
 @RequestMapping("/message")
 public class MessageController {
-    @Resource
-    private MessageMapper messageMapper;
+    @Autowired
+    MessageMapper messageMapper;
+
     @GetMapping("/createMessage")
     public Map<String, Object> creatMessage(@RequestParam("province") String province,
                                             @RequestParam("city") String city,
@@ -54,6 +56,7 @@ public class MessageController {
         }
         return response;
     }
+
     @RequestMapping("/viewMyMessage")
     public Map<String, Object> viewMyMessage(@RequestParam("userId") String userId){
         Map<String,Object> response = new HashMap<>();

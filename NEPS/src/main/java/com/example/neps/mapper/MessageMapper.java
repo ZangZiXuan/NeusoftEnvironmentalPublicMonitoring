@@ -2,6 +2,7 @@ package com.example.neps.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.example.neps.dao.entity.Message;
+import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
 /**

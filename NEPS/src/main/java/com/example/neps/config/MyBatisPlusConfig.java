@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.util.Collections;
-//import org.springframework.transaction.annotation.EnableTransactionManagement;
+
 
 
 @MapperScan("com.example.neps.mapper")
