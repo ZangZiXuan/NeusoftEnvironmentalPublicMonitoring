@@ -1,10 +1,14 @@
 package com.example.neps.dao.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 /**
  * @Author Zang Xinrui
@@ -15,9 +19,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+@Accessors(chain = true)
 @TableName("monitor")
 public class User {
-    @TableField("id")
+    @TableId(value = "id", type = IdType.ASSIGN_UUID)
     private String id;
     @TableField("phone")
     private String phone;
@@ -27,19 +33,6 @@ public class User {
     private Integer sex;
     @TableField("password")
     private String password;
-    @TableField("province")
-    private String province;
-    @TableField("city")
-    private String city;
-    @TableField("address")
-    private String address;
 
-    public User(String id, String phone, Integer age, Integer sex, String password) {
-        this.id = id;
-        this.phone = phone;
-        this.age = age;
-        this.sex = sex;
-        this.password = password;
-    }
 
 }

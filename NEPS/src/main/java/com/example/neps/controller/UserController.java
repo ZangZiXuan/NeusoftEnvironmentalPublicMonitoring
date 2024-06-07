@@ -5,10 +5,7 @@ import com.example.neps.dao.entity.User;
 import com.example.neps.mapper.UserMapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,10 +22,9 @@ import java.util.UUID;
 @RequestMapping("/user")
 public class UserController {
     @Resource
-    UserMapper userMapper;
-
-    public Map<String,Object> creatUser(
-                                        @RequestParam("phone") String phone,
+    private UserMapper userMapper;
+    @GetMapping("/creatUser")
+    public Map<String,Object> creatUser(@RequestParam("phone") String phone,
                                         @RequestParam("age") Integer age,
                                         @RequestParam("sex") Integer sex,
                                         @RequestParam("password") String password){
@@ -49,7 +45,7 @@ public class UserController {
         }
         return response;
     }
-    @PostMapping("/loginChild")
+    @PostMapping("/loginUser")
     public Map<String,Object> loginChild(@RequestParam("phone") String phone,
                                          @RequestParam("password") String password){
         Map<String,Object> response = new HashMap<>();

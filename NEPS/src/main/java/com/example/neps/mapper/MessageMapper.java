@@ -1,17 +1,15 @@
 package com.example.neps.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.example.neps.dao.entity.User;
-import org.apache.ibatis.annotations.Mapper;
+import com.example.neps.dao.entity.Message;
 import org.springframework.stereotype.Repository;
 
 /**
  * @Author Zang Xinrui
  * @Description TODO
- * @Date 2024/6/6 15:37
+ * @Date 2024/6/7 9:28
  * @Version 1.0
  */
 @Repository
-public interface UserMapper extends BaseMapper<User> {
-
+public interface MessageMapper extends BaseMapper<Message> {
 }
