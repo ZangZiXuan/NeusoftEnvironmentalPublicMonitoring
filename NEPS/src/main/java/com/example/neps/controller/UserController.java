@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.neps.dao.entity.User;
 import com.example.neps.mapper.UserMapper;
 
+import com.example.neps.utils.MD5Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -25,27 +26,26 @@ import java.util.UUID;
 public class UserController {
     @Autowired
     UserMapper userMapper;
-    @GetMapping("/creatUser")
-    public Map<String,Object> creatUser(@RequestParam("phone") String phone,
-                                        @RequestParam("age") Integer age,
-                                        @RequestParam("sex") Integer sex,
-                                        @RequestParam("password") String password){
+    @PostMapping("/creatUser")
+    public ResponseEntity<Map<String, Object>> creatUser(@RequestBody User user){
 
-        User user1 = userMapper.selectOne(Wrappers.<User>lambdaQuery().eq(User::getPhone, phone));
+        User user1 = userMapper.selectOne(Wrappers.<User>lambdaQuery().eq(User::getPhone, user.getPhone()));
         Map<String,Object> response = new HashMap<>();
         if(user1 == null){
             String id = UUID.randomUUID().toString();
-            User user = new User(id, phone, age, sex, password);
-            userMapper.insert(user);
-            response.put("success:",true);
-            response.put("data:",user);
+            User user2 = new User(id, user.getPhone(), user.getAge(),
+                    user.getSex(), MD5Util.encode(user.getPassword()));
+            userMapper.insert(user2);
+            response.put("success",true);
+            response.put("data",user2);
             response.put("message","注册成功");
+            return ResponseEntity.ok(response);
         }else{
-            response.put("success:",false);
-            response.put("data:",null);
+            response.put("success",false);
+            response.put("data",null);
             response.put("message","该号码已经注册");
+            return ResponseEntity.badRequest().body(response);
         }
-        return response;
     }
 
 
@@ -55,7 +55,7 @@ public class UserController {
         Map<String,Object> response = new HashMap<>();
         //将输入的数据与数据库进行匹配，看是否存在
         User hasUser = userMapper.selectOne(Wrappers.<User>lambdaQuery().eq(User::getPhone, phone)
-                .eq(User::getPassword, password));
+                .eq(User::getPassword, MD5Util.encode(password)));
         if (hasUser == null) {
             response.put("success",false);
             response.put("data",null);

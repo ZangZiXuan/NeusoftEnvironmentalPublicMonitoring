@@ -16,3 +16,4 @@ spring:
     testOnBorrow: false
     testOnReturn: false
     poolPreparedStatements: true
+

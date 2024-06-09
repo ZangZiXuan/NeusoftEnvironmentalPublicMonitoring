@@ -5,6 +5,7 @@ import com.example.neps.dao.entity.Message;
 import com.example.neps.mapper.MessageMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
@@ -28,13 +29,8 @@ public class MessageController {
     @Autowired
     MessageMapper messageMapper;
 
-    @GetMapping("/createMessage")
-    public Map<String, Object> creatMessage(@RequestParam("province") String province,
-                                            @RequestParam("city") String city,
-                                            @RequestParam("address") String address,
-                                            @RequestParam("level") String level,
-                                            @RequestParam("detail")String detail,
-                                            @RequestParam("userid") String userid) throws ParseException {
+    @PostMapping ("/createMessage")
+    public ResponseEntity<Map<String, Object>> creatMessage(@RequestBody Message message) throws ParseException {
         Map<String,Object> response = new HashMap<>();
         Date currentDate = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -42,36 +38,38 @@ public class MessageController {
         Date date = dateFormat.parse(formattedDate);
 
         String id = UUID.randomUUID().toString();
-        Message message = new Message(id, userid, province, city, level, date, detail,address);
-        int i = messageMapper.insert(message);
+        Message message1 = new Message(id, message.getUserId(), message.getProvince(),
+                message.getCity(), message.getLevel(),
+                date, message.getDetail(),message.getAddress());
+        int i = messageMapper.insert(message1);
         if(i == 0){
-
             response.put("success:",false);
             response.put("data:",null);
             response.put("message","提交空气质量监督信息失败");
+            return ResponseEntity.ok(response);
         }else {
             response.put("success:",true);
             response.put("data:",message);
             response.put("message","提交空气质量监督信息成功");
+            return ResponseEntity.ok(response);
         }
-        return response;
     }
 
-    @RequestMapping("/viewMyMessage")
-    public Map<String, Object> viewMyMessage(@RequestParam("userId") String userId){
+    @RequestMapping("/viewMyMessage/{userId}")
+    public ResponseEntity<Map<String, Object>> viewMyMessage(@PathVariable String userId){
         Map<String,Object> response = new HashMap<>();
         List<Message> list = messageMapper.selectList(Wrappers.<Message>lambdaQuery().eq(Message::getUserId, userId));
         if(list.isEmpty()){
             response.put("success:",false);
             response.put("data:",null);
             response.put("message","暂无任何提交记录");
+            return ResponseEntity.ok(response);
         }else {
             response.put("success:",true);
             response.put("data:",list);
             response.put("message","查询当前用户的所有提交记录成功");
-//            Runtimelogger.info("FileController.getTaskChildPhoto:获取作业图片成功");
+            return ResponseEntity.ok(response);
         }
-        return response;
     }
 
 }

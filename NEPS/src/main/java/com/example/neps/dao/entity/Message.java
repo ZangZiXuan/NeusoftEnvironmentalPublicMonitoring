@@ -35,7 +35,7 @@ public class Message {
     private String city;
     @TableField("level")
     private String level;
-    @TableField("date")
+    @TableField("time")
     private Date date;
 
     @TableField("detail")
