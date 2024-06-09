@@ -20,7 +20,7 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("meshWorker")
+@TableName("mesh_worker")
 public class User {
     @TableField("id")
     private String id;
