@@ -3,14 +3,15 @@
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>
-        <option value="$PROJECT_DIR$/NEPG/pom.xml" />
-        <option value="$PROJECT_DIR$/NEPM/pom.xml" />
-        <option value="$PROJECT_DIR$/NEPS/pom.xml" />
-        <option value="$PROJECT_DIR$/NEPV/pom.xml" />
+        <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/springcloud-api/pom.xml" />
+        <option value="$PROJECT_DIR$/springcloud-messageGriddler/pom.xml" />
+        <option value="$PROJECT_DIR$/springcloud-messageManager/pom.xml" />
+        <option value="$PROJECT_DIR$/springcloud-public/pom.xml" />
       </list>
     </option>
   </component>
-  <component name="ProjectRootManager">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_18" default="true" project-jdk-name="18" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>
