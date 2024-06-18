@@ -12,6 +12,7 @@ import com.example.springcloudapi.utils.CommUtil;
 import com.example.springcloudmessagepublic.mapper.MessagePublicMapper;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +27,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping("/messagePublic")
+
 public class MessagePublicController {
     @Autowired
     MessagePublicMapper messagePublicMapper;

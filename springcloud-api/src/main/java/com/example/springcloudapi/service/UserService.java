@@ -63,7 +63,6 @@ public class UserService {
         if (publicUser != null) {
             return new AuthResult("public", publicUser);
         }
-
         return null; // 用户未找到或密码不匹配
     }
 

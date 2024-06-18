@@ -21,12 +21,12 @@
       <module name="NEPV" target="17" />
       <module name="NeusoftEnvironmentalPublicMonitoring" target="17" />
       <module name="springcloud-api" target="17" />
-      <module name="springcloud-messageGriddler" target="1.5" />
-      <module name="springcloud-messageManager" target="1.5" />
-      <module name="springcloud-messagePublic" target="1.5" />
+      <module name="springcloud-messageGriddler" target="17" />
+      <module name="springcloud-messageManager" target="17" />
+      <module name="springcloud-messagePublic" target="17" />
       <module name="springcloud-neps" target="17" />
       <module name="springcloud-provider-8001" target="17" />
-      <module name="springcloud-public" target="1.5" />
+      <module name="springcloud-public" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
@@ -36,12 +36,12 @@
       <module name="NEPS" options="-parameters" />
       <module name="NEPV" options="-parameters" />
       <module name="springcloud-api" options="-parameters" />
-      <module name="springcloud-messageGriddler" options="" />
-      <module name="springcloud-messageManager" options="" />
-      <module name="springcloud-messagePublic" options="" />
+      <module name="springcloud-messageGriddler" options="-parameters" />
+      <module name="springcloud-messageManager" options="-parameters" />
+      <module name="springcloud-messagePublic" options="-parameters" />
       <module name="springcloud-neps" options="-parameters" />
       <module name="springcloud-provider-8001" options="-parameters" />
-      <module name="springcloud-public" options="" />
+      <module name="springcloud-public" options="-parameters" />
     </option>
   </component>
 </project>
