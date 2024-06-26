@@ -6,12 +6,27 @@
     <file url="file://$PROJECT_DIR$/NEPS/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/NEPV/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/springcloud-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springcloud-api/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springcloud-griddler/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springcloud-griddler/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springcloud-login/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springcloud-login/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springcloud-manager/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springcloud-manager/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/springcloud-messageGriddler/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springcloud-messageGriddler/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/springcloud-messageManager/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springcloud-messageManager/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/springcloud-messagePublic/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springcloud-messagePublic/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/springcloud-neps/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springcloud-policyMaker/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springcloud-policyMaker/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/springcloud-provider-8001/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/springcloud-public/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springcloud-public/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springcloud-user/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springcloud-user/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
   </component>

@@ -1,22 +1,20 @@
 package com.example.springcloudmessagepublic.controller;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.example.springcloudapi.dao.dto.MessagePublic;
+import com.example.springcloudapi.dao.entity.MessagePublic;
 import com.example.springcloudapi.dao.dto.MessagePublicDTO;
 import com.example.springcloudapi.dao.entity.City;
 import com.example.springcloudapi.dao.entity.Province;
-import com.example.springcloudapi.mapper.PublicMapper;
-import com.example.springcloudmessagepublic.mapper.CityMapper;
-import com.example.springcloudmessagepublic.mapper.ProvinceMapper;
-import com.example.springcloudapi.utils.CommUtil;
+import com.example.springcloudapi.dao.entity.Public;
+//import com.example.springcloudapi.mapper.PublicMapper;
+//import com.example.springcloudapi.service.PublicService;
+import com.example.springcloudapi.mapper.CityMapper;
+import com.example.springcloudapi.mapper.ProvinceMapper;
 import com.example.springcloudmessagepublic.mapper.MessagePublicMapper;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.http.HttpResponse;
 import java.util.*;
 
 /**
@@ -31,39 +29,32 @@ import java.util.*;
 public class MessagePublicController {
     @Autowired
     MessagePublicMapper messagePublicMapper;
-
-    @Autowired
     ProvinceMapper provinceMapper;
-    @Autowired
     CityMapper cityMapper;
-    @Autowired
     PublicMapper publicMapper;
-
     /**
-     * 公众管理员端的提交
+     * 公众监督员端的提交
      * @param messagePublic
      * @return ResponseEntity<Map<String, Object>>
      */
     @PostMapping("/submitMessagePublic")
     public ResponseEntity<Map<String, Object>> submitMessagePublic(@RequestBody MessagePublic messagePublic) {
         Map<String, Object> response = new HashMap<>();
-
-
         int insert = messagePublicMapper.insert(messagePublic);
         if(insert == 1){
             response.put("success", true);
-            response.put("message", "公众管理员端的提交添加成功");
+            response.put("message", "公众监督员端的提交添加成功");
             return ResponseEntity.ok(response);
         }else {
             response.put("success", false);
-            response.put("message", "公众管理员端的提交添加失败");
+            response.put("message", "公众监督员端的提交添加失败");
             //返回 400 Bad Request 表示请求不合法.(待推敲哪个状态码更合适)
             return ResponseEntity.badRequest().body(response);
         }
     }
 
     /**
-     * 查找“我”本人提交的反馈信息
+     * 查找特定id的本人提交的反馈信息
      * @param publicId
      * @return ResponseEntity
      */
@@ -72,15 +63,17 @@ public class MessagePublicController {
     public ResponseEntity<Map<String,Object>> ViewMyMessagePublic(@PathVariable String publicId) {
         Map<String, Object> response = new HashMap<>();
 
-        List<MessagePublic> messagePublicList = messagePublicMapper.selectList(Wrappers.<MessagePublic>lambdaQuery().eq(MessagePublic::getPublicId, publicId));
+        List<MessagePublic> messagePublicList = messagePublicMapper.selectList
+                (Wrappers.<MessagePublic>lambdaQuery().eq(MessagePublic::getPublicId, publicId));
         List<MessagePublicDTO> messagePublicDTOList = new ArrayList<>();
         if(!messagePublicList.isEmpty()){
             for (MessagePublic messagePublic :
                     messagePublicList) {
                 City city = cityMapper.selectById(messagePublic.getCityId());
                 Province province = provinceMapper.selectById(city.getProvinceId());
+
                 MessagePublicDTO messagePublicDTO = new MessagePublicDTO(
-                        messagePublic,province.getProvinceName(),city.getCityName(), province.getShortTitle());
+                  null,messagePublic,province.getProvinceName(),city.getCityName(), province.getShortTitle());
                 messagePublicDTOList.add(messagePublicDTO);
             }
             response.put("success", true);
@@ -107,10 +100,16 @@ public class MessagePublicController {
         if(!messagePublicList.isEmpty()) {
             for (MessagePublic messagePublic :
                     messagePublicList) {
+                String publicId = messagePublic.getPublicId();
+                /**
+                 * 从查询public的具体信息
+                 */
+                Public publicDetail = publicMapper.selectById(publicId);
+
                 City city = cityMapper.selectById(messagePublic.getCityId());
                 Province province = provinceMapper.selectById(city.getProvinceId());
                 MessagePublicDTO messagePublicDTO = new MessagePublicDTO(
-                        messagePublic, province.getProvinceName(), city.getCityName(), province.getShortTitle());
+                        publicDetail,messagePublic, province.getProvinceName(), city.getCityName(), province.getShortTitle());
                 messagePublicDTOList.add(messagePublicDTO);
             }
             response.put("success", true);
@@ -155,8 +154,15 @@ public class MessagePublicController {
                     messagePublicList) {
                 City city = cityMapper.selectById(messagePublic.getCityId());
                 Province province = provinceMapper.selectById(city.getProvinceId());
+
+                String publicId = messagePublic.getPublicId();
+                /**
+                 * 从查询public的具体信息
+                 */
+                Public publicDetail = publicMapper.selectById(publicId);
+
                 MessagePublicDTO messagePublicDTO = new MessagePublicDTO(
-                        messagePublic, province.getProvinceName(), city.getCityName(), province.getShortTitle());
+                    publicDetail,messagePublic, province.getProvinceName(), city.getCityName(), province.getShortTitle());
                 messagePublicDTOList.add(messagePublicDTO);
             }
             response.put("success", true);
@@ -170,4 +176,6 @@ public class MessagePublicController {
             return ResponseEntity.badRequest().body(response);
         }
     }
+
+
 }

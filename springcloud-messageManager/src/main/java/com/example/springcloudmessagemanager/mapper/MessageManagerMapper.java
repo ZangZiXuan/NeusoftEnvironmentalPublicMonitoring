@@ -1,7 +1,7 @@
 package com.example.springcloudmessagemanager.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.example.springcloudapi.dao.dto.MessageManager;
+import com.example.springcloudapi.dao.entity.MessageManager;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

@@ -1,19 +1,21 @@
 package com.example.springcloudmessagegriddler.controller;
 
-import com.example.springcloudapi.dao.dto.MessageGriddler;
-import com.example.springcloudapi.mapper.GriddlerMapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.example.springcloudapi.dao.entity.MessageGriddler;
+import com.example.springcloudapi.dao.dto.MessageGriddlerDTO;
+import com.example.springcloudapi.dao.entity.MessagePublic;
+import com.example.springcloudapi.dao.entity.Province;
+import com.example.springcloudapi.mapper.ProvinceMapper;
 import com.example.springcloudapi.utils.CommUtil;
 import com.example.springcloudmessagegriddler.mapper.MessageGriddlerMapper;
-
+import com.example.springcloudmessagepublic.mapper.MessagePublicMapper;
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
-import java.net.http.HttpResponse;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @Author Zang Xinrui
@@ -27,10 +29,18 @@ public class MessageGriddlerController {
     @Autowired
     MessageGriddlerMapper messageGriddlerMapper;
 
+    ProvinceMapper provinceMapper;
+
+    MessagePublicMapper messagePublicMapper;
+    /**
+     * 网格员确认提交数据
+     */
+
     @PostMapping("/creatMessageGriddler")
     public ResponseEntity<Map<String,Object>> creatMessageGriddler(@RequestBody MessageGriddler messageGriddler) {
         messageGriddler.setTime(CommUtil.getNowDateLongStr("yyyy-mm-dd HH:mm:ss"));
         messageGriddler.setId(UUID.randomUUID().toString());
+//        提交该条信息后将状态修改为已确认提交
         messageGriddler.setStatus(1);
         int insert = messageGriddlerMapper.insert(messageGriddler);
         Map<String, Object> response = new HashMap<>();
@@ -46,6 +56,11 @@ public class MessageGriddlerController {
             return ResponseEntity.badRequest().body(response);
         }
     }
+
+    /**
+     * 查看网格员确认的所有信息
+     * @return ResponseEntity
+     */
 
     @GetMapping("/viewAllMessageGriddler")
     public ResponseEntity<Map<String,Object>> viewAllMessageGriddler() {
@@ -64,5 +79,63 @@ public class MessageGriddlerController {
             return ResponseEntity.badRequest().body(response);
         }
     }
+    /**
+     * 管理员端
+     * 省分组分项检查统计
+     *  Provincial subgroup sub-inspection statistics
+     * @Param null
+     * return ResponseEntity
+     */
 
+    @RequestMapping("/viewProvinceSubgroup")
+    public ResponseEntity<Map<String, Object>> viewProvinceSubgroup() {
+        // 获取所有的MessageGriddler记录
+        List<MessageGriddler> messageGriddlers = messageGriddlerMapper.selectList(
+                Wrappers.<MessageGriddler>lambdaQuery().eq(MessageGriddler::getStatus, 1)
+        );
+
+        // 用于存储返回的数据
+        HashMap<String, Object> response = new HashMap<>();
+        // 用于存储统计结果
+        Map<String, MessageGriddlerDTO> provinceStats = new HashMap<>();
+
+        for (MessageGriddler messageGriddler : messageGriddlers) {
+            MessagePublic messagePublic = messagePublicMapper.selectById(messageGriddler.getMessagePublicId());
+            Province province = provinceMapper.selectById(messagePublic.getProvinceId());
+
+            String provinceId = province.getId();
+            MessageGriddlerDTO stats = provinceStats.getOrDefault(provinceId, new MessageGriddlerDTO(
+                    provinceId,
+                    province.getProvinceName(),
+                    province.getShortTitle(),
+                    0, 0, 0, 0
+            ));
+
+            int co = messageGriddler.getCo();
+            int pm = messageGriddler.getPm();
+            int so2 = messageGriddler.getSo2();
+
+            if (co > 24) stats.setCoNum(stats.getCoNum() + 1);
+            if (pm > 150) stats.setPmNum(stats.getPmNum() + 1);
+            if (so2 > 800) stats.setSoNum(stats.getSoNum() + 1);
+            stats.setAQINum(Math.max(Math.max(stats.getCoNum(),stats.getPmNum()),stats.getSoNum()));
+
+            provinceStats.put(provinceId, stats);
+        }
+
+        response.put("provinceStats", new ArrayList<>(provinceStats.values()));
+        if(provinceStats.isEmpty()) {
+            response.put("success", false);
+            response.put("message", "查看省分组分项检查统计数据失败");
+            //返回 400 Bad Request 表示请求不合法.(待推敲哪个状态码更合适)
+            return ResponseEntity.badRequest().body(response);
+        } else {
+            response.put("provinceStats", new ArrayList<>(provinceStats.values()));
+            response.put("data",provinceStats);
+            response.put("success", true);
+            response.put("message", "查看省分组分项检查统计数据成功");
+            return ResponseEntity.ok(response);
+        }
+    }
 }
+

@@ -1,7 +1,7 @@
 package com.example.springcloudmessagegriddler.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.example.springcloudapi.dao.dto.MessageGriddler;
+import com.example.springcloudapi.dao.entity.MessageGriddler;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

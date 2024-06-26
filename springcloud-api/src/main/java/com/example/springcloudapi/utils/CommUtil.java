@@ -16,6 +16,10 @@ public class CommUtil {
         // 格式化当前日期为字符串
         String formattedDate = now.format(formatter);
 
-        return formattedDate;
+
+        // 将格式化后的字符串转换为 Date 对象
+        Date date = java.sql.Timestamp.valueOf(formattedDate);
+
+        return date;
     }
 }

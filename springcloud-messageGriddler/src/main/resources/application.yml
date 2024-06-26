@@ -16,4 +16,5 @@ spring:
     testOnBorrow: false
     testOnReturn: false
     poolPreparedStatements: true
-
+server:
+  port: 8085

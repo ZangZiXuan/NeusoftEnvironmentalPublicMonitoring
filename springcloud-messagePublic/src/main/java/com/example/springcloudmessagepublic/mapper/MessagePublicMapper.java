@@ -1,7 +1,7 @@
 package com.example.springcloudmessagepublic.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.example.springcloudapi.dao.dto.MessagePublic;
+import com.example.springcloudapi.dao.entity.MessagePublic;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -12,4 +12,5 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface MessagePublicMapper extends BaseMapper<MessagePublic> {
+
 }

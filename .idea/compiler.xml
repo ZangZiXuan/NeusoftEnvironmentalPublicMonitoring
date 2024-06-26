@@ -7,11 +7,15 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="springcloud-messagePublic" />
+        <module name="springcloud-login" />
         <module name="springcloud-messageGriddler" />
-        <module name="springcloud-messageManager" />
         <module name="springcloud-api" />
+        <module name="springcloud-griddler" />
+        <module name="springcloud-manager" />
         <module name="springcloud-public" />
+        <module name="springcloud-messagePublic" />
+        <module name="springcloud-messageManager" />
+        <module name="springcloud-policyMaker" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -21,12 +25,17 @@
       <module name="NEPV" target="17" />
       <module name="NeusoftEnvironmentalPublicMonitoring" target="17" />
       <module name="springcloud-api" target="17" />
+      <module name="springcloud-griddler" target="17" />
+      <module name="springcloud-login" target="17" />
+      <module name="springcloud-manager" target="17" />
       <module name="springcloud-messageGriddler" target="17" />
       <module name="springcloud-messageManager" target="17" />
       <module name="springcloud-messagePublic" target="17" />
       <module name="springcloud-neps" target="17" />
+      <module name="springcloud-policyMaker" target="17" />
       <module name="springcloud-provider-8001" target="17" />
       <module name="springcloud-public" target="17" />
+      <module name="springcloud-user" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
@@ -35,13 +44,18 @@
       <module name="NEPM" options="-parameters" />
       <module name="NEPS" options="-parameters" />
       <module name="NEPV" options="-parameters" />
-      <module name="springcloud-api" options="-parameters" />
-      <module name="springcloud-messageGriddler" options="-parameters" />
-      <module name="springcloud-messageManager" options="-parameters" />
-      <module name="springcloud-messagePublic" options="-parameters" />
+      <module name="springcloud-api" options="" />
+      <module name="springcloud-griddler" options="" />
+      <module name="springcloud-login" options="" />
+      <module name="springcloud-manager" options="" />
+      <module name="springcloud-messageGriddler" options="" />
+      <module name="springcloud-messageManager" options="" />
+      <module name="springcloud-messagePublic" options="" />
       <module name="springcloud-neps" options="-parameters" />
+      <module name="springcloud-policyMaker" options="" />
       <module name="springcloud-provider-8001" options="-parameters" />
-      <module name="springcloud-public" options="-parameters" />
+      <module name="springcloud-public" options="" />
+      <module name="springcloud-user" options="" />
     </option>
   </component>
 </project>

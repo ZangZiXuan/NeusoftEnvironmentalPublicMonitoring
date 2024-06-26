@@ -1,7 +1,7 @@
 package com.example.springcloudmessagepublic.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.example.springcloudapi.dao.dto.MessagePublic;
+import com.example.springcloudapi.dao.entity.MessagePublic;
 import com.example.springcloudmessagepublic.mapper.MessagePublicMapper;
 import com.example.springcloudmessagepublic.service.MessagePublicService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,4 +28,6 @@ public class MessagePublicServiceImpl extends ServiceImpl<MessagePublicMapper, M
         int result1 = messagePublicMapper.insert(messagePublic);
         return result1;
     }
+
+
 }

@@ -1,5 +1,7 @@
 package com.example.springcloudapi.dao.dto;
 
+import com.example.springcloudapi.dao.entity.MessagePublic;
+import com.example.springcloudapi.dao.entity.Public;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,6 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class MessagePublicDTO {
+    private Public aPublic;
     private MessagePublic messagePublic;
     private String provinceName;
     private String cityName;

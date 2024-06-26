@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.system</groupId>
+    <groupId>com.example</groupId>
     <artifactId>NeusoftEnvironmentalPublicMonitoring</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -13,13 +13,11 @@
         <module>springcloud-messageGriddler</module>
         <module>springcloud-messageManager</module>
         <module>springcloud-public</module>
-<!--        <module>system-PermissionControl</module>-->
-<!--        <module>system-ReportManage</module>-->
-<!--        <module>system-TaskManage</module>-->
-<!--        <module>system-SubmissionManage</module>-->
-<!--        <module>system-AirDataManage</module>-->
-<!--        <module>system-ZoneManage</module>-->
-<!--        <module>system-gateway</module>-->
+        <module>springcloud-login</module>
+        <module>springcloud-manager</module>
+        <module>springcloud-policyMaker</module>
+        <module>springcloud-griddler</module>
+<!--        <module>springcloud-user</module>-->
     </modules>
 
     <properties>
@@ -27,7 +25,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <spring-cloud-alibaba.version>2022.0.0.0</spring-cloud-alibaba.version>
         <spring-cloud.version>2023.0.1</spring-cloud.version>
-        <spring-boot.version>3.3.0</spring-boot.version>
+        <spring-boot.version>3.2.6</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 

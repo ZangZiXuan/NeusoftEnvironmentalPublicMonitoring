@@ -1,10 +1,12 @@
 package com.example.springcloudmessagemanager.controller;
 
-import com.example.springcloudapi.dao.dto.MessageManager;
+import com.example.springcloudapi.dao.entity.MessageManager;
 import com.example.springcloudmessagemanager.mapper.MessageManagerMapper;
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +24,8 @@ public class MessageManagerController {
 
     @Autowired
     MessageManagerMapper messageManagerMapper;
+    @Resource
+    private RestTemplate restTemplate;
 
     @PostMapping("/creatAssignedMessageManager/{messageId}")
     public ResponseEntity<Map<String,Object>> creatAssignedMessageManager(@PathVariable String messageId,
@@ -41,7 +45,7 @@ public class MessageManagerController {
         }
     }
 
-    @RequestMapping("/viewAllAssignedMessageManager/")
+    @RequestMapping("/viewAllAssignedMessageManager")
     public ResponseEntity<Map<String,Object>> viewAllAssignedMessageManager(@RequestParam("status") Integer status) {
         List<MessageManager> messageManagers = messageManagerMapper.selectList(null);
 

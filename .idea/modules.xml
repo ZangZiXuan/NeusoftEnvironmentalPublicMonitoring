@@ -4,9 +4,13 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/NeusoftEnvironmentalPublicMonitoring.iml" filepath="$PROJECT_DIR$/.idea/NeusoftEnvironmentalPublicMonitoring.iml" />
       <module fileurl="file://$PROJECT_DIR$/springcloud-api/springcloud-api.iml" filepath="$PROJECT_DIR$/springcloud-api/springcloud-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/springcloud-griddler/springcloud-griddler.iml" filepath="$PROJECT_DIR$/springcloud-griddler/springcloud-griddler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/springcloud-login/springcloud-login.iml" filepath="$PROJECT_DIR$/springcloud-login/springcloud-login.iml" />
+      <module fileurl="file://$PROJECT_DIR$/springcloud-manager/springcloud-manager.iml" filepath="$PROJECT_DIR$/springcloud-manager/springcloud-manager.iml" />
       <module fileurl="file://$PROJECT_DIR$/springcloud-messageGriddler/springcloud-messageGriddler.iml" filepath="$PROJECT_DIR$/springcloud-messageGriddler/springcloud-messageGriddler.iml" />
       <module fileurl="file://$PROJECT_DIR$/springcloud-messageManager/springcloud-messageManager.iml" filepath="$PROJECT_DIR$/springcloud-messageManager/springcloud-messageManager.iml" />
       <module fileurl="file://$PROJECT_DIR$/springcloud-messagePublic/springcloud-messagePublic.iml" filepath="$PROJECT_DIR$/springcloud-messagePublic/springcloud-messagePublic.iml" />
+      <module fileurl="file://$PROJECT_DIR$/springcloud-policyMaker/springcloud-policyMaker.iml" filepath="$PROJECT_DIR$/springcloud-policyMaker/springcloud-policyMaker.iml" />
       <module fileurl="file://$PROJECT_DIR$/springcloud-public/springcloud-public.iml" filepath="$PROJECT_DIR$/springcloud-public/springcloud-public.iml" />
     </modules>
   </component>

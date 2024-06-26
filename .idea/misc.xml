@@ -8,7 +8,17 @@
         <option value="$PROJECT_DIR$/springcloud-messageGriddler/pom.xml" />
         <option value="$PROJECT_DIR$/springcloud-messageManager/pom.xml" />
         <option value="$PROJECT_DIR$/springcloud-public/pom.xml" />
+        <option value="$PROJECT_DIR$/springcloud-user/pom.xml" />
+        <option value="$PROJECT_DIR$/springcloud-login/pom.xml" />
+        <option value="$PROJECT_DIR$/springcloud-griddler/pom.xml" />
+        <option value="$PROJECT_DIR$/springcloud-policyMaker/pom.xml" />
+        <option value="$PROJECT_DIR$/springcloud-manager/pom.xml" />
       </list>
+    </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/springcloud-user/pom.xml" />
+      </set>
     </option>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_18" default="true" project-jdk-name="18" project-jdk-type="JavaSDK">
