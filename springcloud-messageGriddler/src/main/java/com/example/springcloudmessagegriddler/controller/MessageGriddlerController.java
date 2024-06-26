@@ -37,33 +37,35 @@ public class MessageGriddlerController {
      */
 
     @PostMapping("/creatMessageGriddler")
-    public ResponseEntity<Map<String,Object>> creatMessageGriddler(@RequestBody MessageGriddler messageGriddler) {
-        messageGriddler.setTime(CommUtil.getNowDateLongStr("yyyy-mm-dd HH:mm:ss"));
-        messageGriddler.setId(UUID.randomUUID().toString());
-//        提交该条信息后将状态修改为已确认提交
-        messageGriddler.setStatus(1);
+    public Map<String,Object> creatMessageGriddler(@RequestParam("co") int co,
+            @RequestParam("pm") int pm,@RequestParam("so2") int so2,
+            @RequestParam("message_public_id") String messagePublicId) {
+        MessageGriddler messageGriddler = new MessageGriddler(
+                UUID.randomUUID().toString(),messagePublicId,so2,co,pm,
+                CommUtil.getNowDateLongStr("yyyy-mm-dd HH:mm:ss"),1
+        );
         int insert = messageGriddlerMapper.insert(messageGriddler);
         Map<String, Object> response = new HashMap<>();
-
         if(insert == 1){
             response.put("success", true);
             response.put("message", "网格员端的提交实测数据添加成功");
-            return ResponseEntity.ok(response);
+            response.put("data",insert);
+            return response;
         }else {
             response.put("success", false);
             response.put("message", "网格员端的提交实测数据添加失败");
-            //返回 400 Bad Request 表示请求不合法.(待推敲哪个状态码更合适)
-            return ResponseEntity.badRequest().body(response);
+            response.put("data",null);
+            return response;
         }
     }
 
     /**
      * 查看网格员确认的所有信息
-     * @return ResponseEntity
+     * @return Map
      */
 
     @GetMapping("/viewAllMessageGriddler")
-    public ResponseEntity<Map<String,Object>> viewAllMessageGriddler() {
+    public Map<String,Object> viewAllMessageGriddler() {
         List<MessageGriddler> messageGriddlerList = messageGriddlerMapper.selectList(null);
 
         Map<String, Object> response = new HashMap<>();
@@ -71,12 +73,14 @@ public class MessageGriddlerController {
         if(!messageGriddlerList.isEmpty()){
             response.put("success", true);
             response.put("message", "查看所有的网格员端的提交实测数据成功");
-            return ResponseEntity.ok(response);
+            response.put("data",messageGriddlerList);
+            return response;
         }else {
             response.put("success", false);
             response.put("message", "查看所有的网格员端的提交实测数据失败");
+            response.put("data",null);
             //返回 400 Bad Request 表示请求不合法.(待推敲哪个状态码更合适)
-            return ResponseEntity.badRequest().body(response);
+            return response;
         }
     }
     /**
@@ -88,7 +92,7 @@ public class MessageGriddlerController {
      */
 
     @RequestMapping("/viewProvinceSubgroup")
-    public ResponseEntity<Map<String, Object>> viewProvinceSubgroup() {
+    public Map<String, Object> viewProvinceSubgroup() {
         // 获取所有的MessageGriddler记录
         List<MessageGriddler> messageGriddlers = messageGriddlerMapper.selectList(
                 Wrappers.<MessageGriddler>lambdaQuery().eq(MessageGriddler::getStatus, 1)
@@ -127,14 +131,14 @@ public class MessageGriddlerController {
         if(provinceStats.isEmpty()) {
             response.put("success", false);
             response.put("message", "查看省分组分项检查统计数据失败");
-            //返回 400 Bad Request 表示请求不合法.(待推敲哪个状态码更合适)
-            return ResponseEntity.badRequest().body(response);
+            response.put("data",null);
+            return response;
         } else {
             response.put("provinceStats", new ArrayList<>(provinceStats.values()));
             response.put("data",provinceStats);
             response.put("success", true);
             response.put("message", "查看省分组分项检查统计数据成功");
-            return ResponseEntity.ok(response);
+            return response;
         }
     }
 }

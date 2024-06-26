@@ -24,24 +24,30 @@ public class MessageManagerController {
 
     @Autowired
     MessageManagerMapper messageManagerMapper;
-    @Resource
-    private RestTemplate restTemplate;
 
-    @PostMapping("/creatAssignedMessageManager/{messageId}")
-    public ResponseEntity<Map<String,Object>> creatAssignedMessageManager(@PathVariable String messageId,
-                                                                          @RequestBody MessageManager messageManager) {
+    /**
+     * 管理员分配任务给网格员
+     * @param messageManager
+     * @return
+     */
+
+    @PostMapping("/creatAssignedMessageManager")
+    public Map<String,Object> creatAssignedMessageManager(@RequestBody MessageManager messageManager) {
+
         int insert = messageManagerMapper.insert(messageManager);
         Map<String, Object> response = new HashMap<>();
 
         if(insert == 1){
             response.put("success", true);
             response.put("message", "公众管理员端的提交添加成功");
-            return ResponseEntity.ok(response);
+            response.put("data",insert);
+            return response;
         }else {
             response.put("success", false);
             response.put("message", "公众管理员端的提交添加失败");
+            response.put("data",null);
             //返回 400 Bad Request 表示请求不合法.(待推敲哪个状态码更合适)
-            return ResponseEntity.badRequest().body(response);
+            return response;
         }
     }
 

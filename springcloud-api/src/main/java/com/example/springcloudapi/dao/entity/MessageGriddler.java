@@ -29,7 +29,7 @@ public class MessageGriddler {
     @TableId(value = "id",type = IdType.ASSIGN_UUID)
     private String id;
     @TableField("message_public_id")
-    private int messagePublicId;
+    private String messagePublicId;
     private int so2;
     private int co;
     private int pm;
