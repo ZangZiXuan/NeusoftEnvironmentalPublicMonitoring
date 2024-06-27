@@ -16,8 +16,9 @@ import java.util.Map;
  * @Date 2024/6/25 13:45
  * @Version 1.0
  */
+//name = "springcloud-public-service",
 @FeignClient(name = "springcloud-public",url = "localhost:8089")
 public interface PublicFeignService {
-    @GetMapping("/publicDetail/{publicId}")
-    Public getPublicById(@PathVariable String publicId);
+    @PostMapping("/publicDetail")
+    Public getPublicById(@RequestBody String publicId);
 }

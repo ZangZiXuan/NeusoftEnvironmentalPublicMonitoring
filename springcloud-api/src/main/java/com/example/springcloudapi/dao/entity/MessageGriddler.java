@@ -38,4 +38,5 @@ public class MessageGriddler {
      * 待确认：0，已确认1
      */
     private int status;
+    private int aqiLevel;
 }

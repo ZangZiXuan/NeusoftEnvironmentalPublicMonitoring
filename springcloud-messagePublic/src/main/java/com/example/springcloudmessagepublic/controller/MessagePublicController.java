@@ -26,7 +26,6 @@ import java.util.*;
  */
 @RestController
 @RequestMapping("/messagePublic")
-
 public class MessagePublicController {
     @Autowired
     MessagePublicMapper messagePublicMapper;
@@ -34,7 +33,6 @@ public class MessagePublicController {
     CitiesFeignService citiesFeignService;
     @Autowired
     ProvinceFeignService provinceFeignService;
-
     @Autowired
     PublicFeignService publicFeignService;
     /**
@@ -67,7 +65,7 @@ public class MessagePublicController {
      */
 
     @GetMapping("/ViewMyMessagePublic/{publicId}")
-    public Map<String,Object> ViewMyMessagePublic(@PathVariable String publicId) {
+    public Map<String,Object> ViewMyMessagePublic(@PathVariable("publicId") String publicId) {
         Map<String, Object> response = new HashMap<>();
 
         List<MessagePublic> messagePublicList = messagePublicMapper.selectList

@@ -12,8 +12,9 @@ import java.util.Map;
  * @Date 2024/6/27 9:44
  * @Version 1.0
  */
-@FeignClient(name = "springcloud-public",url = "localhost:8081")
+//name = "springcloud-api-province",
+@FeignClient(name = "springcloud-province",url = "localhost:8081")
 public interface ProvinceFeignService {
     @PostMapping("/selectProvince")
-    public Map<String,Object> selectProvince(@RequestParam("provinceId") String provinceId);
+    Map<String,Object> selectProvince(@RequestParam("provinceId") String provinceId);
 }

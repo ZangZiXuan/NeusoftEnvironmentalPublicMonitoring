@@ -8,7 +8,6 @@ import org.springframework.cloud.openfeign.FeignClient;
 @SpringBootApplication
 @EnableFeignClients
 public class SpringcloudMessagePublicApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(SpringcloudMessagePublicApplication.class, args);
 	}

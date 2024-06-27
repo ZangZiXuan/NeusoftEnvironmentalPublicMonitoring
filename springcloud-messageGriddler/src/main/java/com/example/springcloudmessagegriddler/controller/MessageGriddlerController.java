@@ -1,6 +1,7 @@
 package com.example.springcloudmessagegriddler.controller;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.example.springcloudapi.dao.dto.AQIDTO;
 import com.example.springcloudapi.dao.entity.MessageGriddler;
 import com.example.springcloudapi.dao.dto.MessageGriddlerDTO;
 import com.example.springcloudapi.dao.entity.MessagePublic;
@@ -9,8 +10,10 @@ import com.example.springcloudapi.mapper.ProvinceMapper;
 import com.example.springcloudapi.utils.CommUtil;
 import com.example.springcloudmessagegriddler.feign.CitiesFeignService;
 import com.example.springcloudmessagegriddler.feign.MessagePublicFeignService;
+import com.example.springcloudmessagegriddler.mapper.AQIMapper;
 import com.example.springcloudmessagegriddler.mapper.MessageGriddlerMapper;
 import com.example.springcloudmessagegriddler.feign.ProvinceFeignService;
+import com.example.springcloudmessagegriddler.service.AQIService;
 import com.example.springcloudmessagepublic.mapper.MessagePublicMapper;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +41,8 @@ public class MessageGriddlerController {
     MessagePublicFeignService messagePublicFeignService;
     @Autowired
     CitiesFeignService citiesFeignService;
+    @Autowired
+    AQIMapper aqiMapper;
     /**
      * 网格员确认提交数据
      */
@@ -45,10 +50,10 @@ public class MessageGriddlerController {
     @PostMapping("/creatMessageGriddler")
     public Map<String,Object> creatMessageGriddler(@RequestParam("co") int co,
             @RequestParam("pm") int pm,@RequestParam("so2") int so2,
-            @RequestParam("message_public_id") String messagePublicId) {
+            @RequestParam("message_public_id") String messagePublicId,@RequestParam("aqi_level") int aqiLevel) {
         MessageGriddler messageGriddler = new MessageGriddler(
                 UUID.randomUUID().toString(),messagePublicId,so2,co,pm,
-                CommUtil.getNowDateLongStr("yyyy-mm-dd HH:mm:ss"),1
+                CommUtil.getNowDateLongStr("yyyy-mm-dd HH:mm:ss"),1,aqiLevel
         );
         int insert = messageGriddlerMapper.insert(messageGriddler);
         Map<String, Object> response = new HashMap<>();
@@ -89,6 +94,10 @@ public class MessageGriddlerController {
             return response;
         }
     }
+    /**
+     * 管理员端
+     * 以下均为统计信息模块
+     */
     /**
      * 管理员端
      * 省分组分项检查统计
@@ -147,6 +156,21 @@ public class MessageGriddlerController {
             return response;
         }
     }
+    /**
+     * 管理员端
+     * 统计信息管理
+     * AQI空气质量指数级别分布
+     *
+     */
+    @Autowired
+    private AQIService aqiService;
 
+    @RequestMapping("/executeAQILevel")
+    public Map<String, Object> executeAQILevel() {
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("data", aqiDistribution);
+        return result;
+    }
 }
 

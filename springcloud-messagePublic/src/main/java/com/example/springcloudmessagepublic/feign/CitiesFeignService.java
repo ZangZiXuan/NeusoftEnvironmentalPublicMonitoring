@@ -12,7 +12,8 @@ import java.util.Map;
  * @Date 2024/6/27 9:50
  * @Version 1.0
  */
-@FeignClient(name = "springcloud-public",url = "localhost:8081")
+//name = "springcloud-api-cities",
+@FeignClient(name = "springcloud-cities",url = "localhost:8081")
 public interface CitiesFeignService {
     @RequestMapping("/selectCity")
     Map<String,Object> selectCity(@RequestParam("cityId") String cityId);
