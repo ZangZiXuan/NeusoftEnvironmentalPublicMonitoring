@@ -28,7 +28,7 @@ public class MessageManagerController {
     /**
      * 管理员分配任务给网格员
      * @param messageManager
-     * @return
+     * @return Map
      */
 
     @PostMapping("/creatAssignedMessageManager")

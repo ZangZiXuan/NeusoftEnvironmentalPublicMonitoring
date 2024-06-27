@@ -14,9 +14,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PlaceDTO {
+    private String shortTitle;
     private String provinceId;
     private String cityId;
-    private String address;
+
 
 
 }

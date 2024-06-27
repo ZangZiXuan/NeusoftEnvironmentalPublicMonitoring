@@ -27,8 +27,8 @@ public class MessagePublic {
     @TableId(value = "id",type = IdType.ASSIGN_UUID)
     private String id;
     private String publicId;
-    private int provinceId;
-    private int cityId;
+    private String provinceId;
+    private String cityId;
     private String address;
     private int level;
     private String description;
@@ -40,7 +40,7 @@ public class MessagePublic {
      */
     private int status;
 
-    public MessagePublic(String id, String publicId, int provinceId, int cityId, String address) {
+    public MessagePublic(String id, String publicId, String provinceId, String cityId, String address) {
         this.id = id;
         this.publicId = publicId;
         this.provinceId = provinceId;

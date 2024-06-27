@@ -10,8 +10,6 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 
 @SpringBootApplication
-
-//@EnableFeignClients    //启用OpenFeign
 @Slf4j
 public class SpringcloudApiApplication {
 

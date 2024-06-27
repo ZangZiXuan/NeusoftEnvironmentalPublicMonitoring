@@ -8,6 +8,8 @@ import com.example.springcloudapi.dao.entity.Province;
 import com.example.springcloudapi.dao.entity.Public;
 import com.example.springcloudapi.mapper.CityMapper;
 import com.example.springcloudapi.mapper.ProvinceMapper;
+import com.example.springcloudmessagepublic.feign.CitiesFeignService;
+import com.example.springcloudmessagepublic.feign.ProvinceFeignService;
 import com.example.springcloudmessagepublic.feign.PublicFeignService;
 import com.example.springcloudmessagepublic.mapper.MessagePublicMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +30,11 @@ import java.util.*;
 public class MessagePublicController {
     @Autowired
     MessagePublicMapper messagePublicMapper;
-    ProvinceMapper provinceMapper;
-    CityMapper cityMapper;
+    @Autowired
+    CitiesFeignService citiesFeignService;
+    @Autowired
+    ProvinceFeignService provinceFeignService;
+
     @Autowired
     PublicFeignService publicFeignService;
     /**
@@ -71,8 +76,8 @@ public class MessagePublicController {
         if(!messagePublicList.isEmpty()){
             for (MessagePublic messagePublic :
                     messagePublicList) {
-                City city = cityMapper.selectById(messagePublic.getCityId());
-                Province province = provinceMapper.selectById(city.getProvinceId());
+                City city = (City)citiesFeignService.selectCity(messagePublic.getCityId());
+                Province province = (Province) provinceFeignService.selectProvince(city.getProvinceId());
 
                 MessagePublicDTO messagePublicDTO = new MessagePublicDTO(
                   null,messagePublic,province.getProvinceName(),city.getCityName(), province.getShortTitle());
@@ -107,9 +112,10 @@ public class MessagePublicController {
                  * 从查询public的具体信息
                  */
                 Public publicDetail = publicFeignService.getPublicById(publicId);
-
-                City city = cityMapper.selectById(messagePublic.getCityId());
-                Province province = provinceMapper.selectById(city.getProvinceId());
+//City city = (City)citiesFeignService.selectCity(messagePublic.getCityId());
+//                Province province = (Province) provinceFeignService.selectProvince(city.getProvinceId());
+                City city = (City)citiesFeignService.selectCity(messagePublic.getCityId());
+                Province province = (Province) provinceFeignService.selectProvince(city.getProvinceId());
                 MessagePublicDTO messagePublicDTO = new MessagePublicDTO(
                         publicDetail,messagePublic, province.getProvinceName(), city.getCityName(), province.getShortTitle());
                 messagePublicDTOList.add(messagePublicDTO);
@@ -156,8 +162,8 @@ public class MessagePublicController {
         if(!messagePublicList.isEmpty()) {
             for (MessagePublic messagePublic :
                     messagePublicList) {
-                City city = cityMapper.selectById(messagePublic.getCityId());
-                Province province = provinceMapper.selectById(city.getProvinceId());
+                City city = (City)citiesFeignService.selectCity(messagePublic.getCityId());
+                Province province = (Province) provinceFeignService.selectProvince(city.getProvinceId());
 
                 String publicId = messagePublic.getPublicId();
                 /**
@@ -182,5 +188,29 @@ public class MessagePublicController {
         }
     }
 
+    /**
+     *
+     * @param pubicId
+     * @return
+     */
+    @RequestMapping("/selectMessagePublic")
+    public Map<String,Object> selectMessagePublic(@RequestParam("publicId") String pubicId) {
+        HashMap<String, Object> response = new HashMap<>();
+        List<MessagePublic> messagePublics = messagePublicMapper.selectList(Wrappers.<MessagePublic>lambdaQuery().eq(MessagePublic::getPublicId, pubicId));
 
+        if(messagePublics.isEmpty()) {
+            response.put("success", false);
+            response.put("message", "当前用户还未提交过反馈信息");
+            response.put("data",null);
+            //返回 400 Bad Request 表示请求不合法.(待推敲哪个状态码更合适)
+            return response;
+
+        }else {
+            response.put("success", true);
+            response.put("message", "查询所有的公众监督员的提交记录成功");
+            response.put("data",messagePublics);
+            return response;
+        }
+    }
 }
+

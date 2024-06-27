@@ -1,4 +1,4 @@
-package com.example.springcloudmessagepublic.feign;
+package com.example.springcloudmessagegriddler.feign;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,11 +9,11 @@ import java.util.Map;
 /**
  * @Author Zang Xinrui
  * @Description TODO
- * @Date 2024/6/27 9:44
+ * @Date 2024/6/26 15:08
  * @Version 1.0
  */
-@FeignClient(name = "springcloud-public",url = "localhost:8081")
+@FeignClient(name = "province-service",url = "localhost:8081")
 public interface ProvinceFeignService {
     @PostMapping("/selectProvince")
-    public Map<String,Object> selectProvince(@RequestParam("provinceId") String provinceId);
+    Map<String,Object> selectProvince(@RequestParam("provinceId") String provinceId);
 }

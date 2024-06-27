@@ -7,7 +7,10 @@ import com.example.springcloudapi.dao.entity.MessagePublic;
 import com.example.springcloudapi.dao.entity.Province;
 import com.example.springcloudapi.mapper.ProvinceMapper;
 import com.example.springcloudapi.utils.CommUtil;
+import com.example.springcloudmessagegriddler.feign.CitiesFeignService;
+import com.example.springcloudmessagegriddler.feign.MessagePublicFeignService;
 import com.example.springcloudmessagegriddler.mapper.MessageGriddlerMapper;
+import com.example.springcloudmessagegriddler.feign.ProvinceFeignService;
 import com.example.springcloudmessagepublic.mapper.MessagePublicMapper;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +32,12 @@ public class MessageGriddlerController {
     @Autowired
     MessageGriddlerMapper messageGriddlerMapper;
 
-    ProvinceMapper provinceMapper;
-
-    MessagePublicMapper messagePublicMapper;
+    @Autowired
+    ProvinceFeignService provinceFeignService;
+    @Autowired
+    MessagePublicFeignService messagePublicFeignService;
+    @Autowired
+    CitiesFeignService citiesFeignService;
     /**
      * 网格员确认提交数据
      */
@@ -104,8 +110,8 @@ public class MessageGriddlerController {
         Map<String, MessageGriddlerDTO> provinceStats = new HashMap<>();
 
         for (MessageGriddler messageGriddler : messageGriddlers) {
-            MessagePublic messagePublic = messagePublicMapper.selectById(messageGriddler.getMessagePublicId());
-            Province province = provinceMapper.selectById(messagePublic.getProvinceId());
+            MessagePublic messagePublic = (MessagePublic) messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId());
+            Province province = (Province) provinceFeignService.selectProvince(messagePublic.getProvinceId()).get("data");
 
             String provinceId = province.getId();
             MessageGriddlerDTO stats = provinceStats.getOrDefault(provinceId, new MessageGriddlerDTO(
@@ -141,5 +147,6 @@ public class MessageGriddlerController {
             return response;
         }
     }
+
 }
 
