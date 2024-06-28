@@ -1,5 +1,6 @@
 package com.example.springcloudapi.dao.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,4 +21,8 @@ public class City {
     private String cityId;
     private String cityName;
     private String provinceId;
+    @TableField("is_capital_city")
+    private int isCapitalCity;
+    @TableField("is_big_city")
+    private int isBigCity;
 }

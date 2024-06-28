@@ -2,13 +2,11 @@ package com.example.springcloudmessagegriddler.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.springcloudapi.dao.dto.AQIDTO;
-import com.example.springcloudapi.dao.entity.AQI;
-import com.example.springcloudapi.dao.entity.MessageGriddler;
+import com.example.springcloudapi.dao.entity.*;
 import com.example.springcloudapi.dao.dto.MessageGriddlerDTO;
-import com.example.springcloudapi.dao.entity.MessagePublic;
-import com.example.springcloudapi.dao.entity.Province;
 import com.example.springcloudapi.mapper.ProvinceMapper;
 import com.example.springcloudapi.utils.CommUtil;
 import com.example.springcloudmessagegriddler.feign.CitiesFeignService;
@@ -20,6 +18,7 @@ import com.example.springcloudmessagegriddler.service.AQIService;
 import com.example.springcloudmessagepublic.mapper.MessagePublicMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -200,16 +199,11 @@ public class MessageGriddlerController {
      * AQI空气质量指数超标数量统计表
      * @return
      */
-    @GetMapping("AqiLevelOver")
+    @GetMapping("/AqiLevelOver")
     public Map<String,Object> AqiLevelOver() {
-        LambdaQueryWrapper<MessageGriddler> queryWrapper = Wrappers.lambdaQuery();
-
-        messageGriddlerMapper.selectList(Wrappers.<MessageGriddler>lambdaQuery()
-                .gt)
-        queryWrapper.gt(MessageGriddler::getAqiLevel, 3)
-                .select(MessageGriddler::getTime);
-
-        List<MessageGriddler> list = this.list(queryWrapper);
+        List<MessageGriddler> list = messageGriddlerMapper.selectList(Wrappers.<MessageGriddler>lambdaQuery()
+                .gt(MessageGriddler::getAqiLevel, 3)
+                .select(MessageGriddler::getTime));
 
         // 通过 Java 流处理逐月分组和统计
         Map<String, Long> result = list.stream()
@@ -218,7 +212,79 @@ public class MessageGriddlerController {
                         Collectors.counting()
                 ));
 
-        return result;
+        HashMap<String, Object> response = new HashMap<>();
+        if(!result.isEmpty()) {
+            response.put("data",result);
+            response.put("success",true);
+            response.put("message","获取到逐月的分组和统计成功");
+            return response;
+        }else {
+            response.put("data",null);
+            response.put("success",false);
+            response.put("message","获取到逐月的分组和统计失败");
+            return response;
+        }
+    }
+    @GetMapping("/elseData")
+    public Map<String,Object> ElseData() {
+        int sumTest = Integer.parseInt(messageGriddlerMapper.selectCount(Wrappers.<MessageGriddler>lambdaQuery()
+                .eq(MessageGriddler::getStatus, 1)).toString());
+        int goodLevel = Integer.parseInt(messageGriddlerMapper.selectCount(Wrappers.<MessageGriddler>lambdaQuery()
+                .eq(MessageGriddler::getStatus, 1)
+                        .lt(MessageGriddler::getAqiLevel,2)
+                ).toString());
+
+        Map<String, Object> result = new HashMap<>();
+        HashMap<String, Object> response = new HashMap<>();
+        result.put("空气质量检测总数量",sumTest);
+        result.put("空气质量检测良好数量",goodLevel);
+//        List<MessageGriddler> list = messageGriddlerMapper.selectList(Wrappers.<MessageGriddler>lambdaQuery()
+//                .eq(MessageGriddler::getStatus, 1));
+//        for(MessageGriddler messageGriddler:list) {
+//            Object data = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("data");
+//            ObjectMapper objectMapper = new ObjectMapper();
+//            MessagePublic messagePublic = objectMapper.convertValue(data, MessagePublic.class);
+////            @PostMapping("/city/selectCity")
+////    public Map<String,Object> selectCity(@RequestBody String cityId);
+//            Object data1 = citiesFeignService.selectCity(messagePublic.getCityId()).get("data");
+//            ObjectMapper objectMapper2 = new ObjectMapper();
+//            City c = objectMapper2.convertValue(data, City.class);
+//            if(c.getIsCapitalCity()==1) {
+//
+//            }
+//        }
+        List<String> allCapitalCity = citiesFeignService.findAllCapitalCity();
+        List<String> allAddressByCity = messagePublicFeignService.findAllAddressByCity();
+        int countCapitalCity = countCommonElements(allCapitalCity, allAddressByCity);
+        double capitalCityLevel = countCapitalCity / 34;
+        result.put("省会城市网格覆盖范围",capitalCityLevel);
+        List<String> allBigCity = citiesFeignService.findAllBigCity();
+        int countBigCity = countCommonElements(allBigCity, allAddressByCity);
+        double bigCityLevel = countBigCity / 391;
+        result.put("大城市覆盖范围",bigCityLevel);
+        if(result.isEmpty()) {
+            response.put("data",null);
+            response.put("success",false);
+            response.put("message","获取其他统计信息失败");
+            return response;
+        } else {
+            response.put("data",result);
+            response.put("success",true);
+            response.put("message","获取其他统计信息成功");
+            return response;
+        }
+    }
+    // 方法计算两个列表中相同字符串的数量
+    public int countCommonElements(List<String> list1, List<String> list2) {
+        // 使用Set来存储列表中的字符串，自动去重
+        Set<String> set1 = new HashSet<>(list1);
+        Set<String> set2 = new HashSet<>(list2);
+
+        // 保留set1和set2的交集
+        set1.retainAll(set2);
+
+        // 交集的大小就是两个列表中相同字符串的数量
+        return set1.size();
     }
 }
 

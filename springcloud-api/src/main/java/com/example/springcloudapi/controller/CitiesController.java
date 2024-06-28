@@ -1,5 +1,6 @@
 package com.example.springcloudapi.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.springcloudapi.dao.dto.PlaceDTO;
 import com.example.springcloudapi.dao.entity.City;
@@ -9,8 +10,11 @@ import com.example.springcloudapi.mapper.ProvinceMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @Author Zang Xinrui
@@ -46,5 +50,32 @@ public class CitiesController {
             return response;
         }
 
+    }
+
+    /**
+     * 获取所有的省会城市
+     *
+     */
+    @GetMapping("/findAllCapitalCity")
+    public List<String> findAllCapitalCity() {
+
+        List<String> capitalCityIds = cityMapper.selectList(Wrappers.<City>lambdaQuery()
+                        .eq(City::getIsCapitalCity, 1))
+                .stream()
+                .map(City::getCityId)
+                .collect(Collectors.toList());
+        return capitalCityIds;
+    }
+    /**
+     * 获取所有大城市
+     */
+    @GetMapping("/findAllBigCity")
+    public List<String> findAllBigCity() {
+        List<String> capitalCityIds = cityMapper.selectList(Wrappers.<City>lambdaQuery()
+                        .eq(City::getIsBigCity, 1))
+                .stream()
+                .map(City::getCityId)
+                .collect(Collectors.toList());
+        return capitalCityIds;
     }
 }

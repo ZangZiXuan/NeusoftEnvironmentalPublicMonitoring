@@ -4,6 +4,7 @@ import com.example.springcloudapi.dao.entity.AQI;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,4 +21,9 @@ public interface CitiesFeignService {
     public Map<String,Object> selectProvince(@RequestBody String provinceId);
     @PostMapping("/aqi/findAqiDetails")
     public AQI findAqiDetails(@RequestBody String aqiLevel);
+
+    @GetMapping("/city/findAllCapitalCity")
+    public List<String> findAllCapitalCity();
+    @GetMapping("/city/findAllBigCity")
+    public List<String> findAllBigCity();
 }

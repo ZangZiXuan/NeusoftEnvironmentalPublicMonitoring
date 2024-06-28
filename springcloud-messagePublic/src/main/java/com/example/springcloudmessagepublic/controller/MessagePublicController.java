@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Author Zang Xinrui
@@ -212,5 +213,22 @@ public class MessagePublicController {
             return response;
         }
     }
+
+
+    /**
+     * 统计反馈信息来自的地区
+     *
+     */
+    @GetMapping("/findAllAddressByCityId")
+    public List<String> findAllAddressByCity() {
+        List<String> list = messagePublicMapper.selectList(null)
+                .stream()
+                .map(MessagePublic::getCityId)
+                .collect(Collectors.toList());
+
+        return list;
+    }
+
+
 }
 
