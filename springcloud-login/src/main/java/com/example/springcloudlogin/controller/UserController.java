@@ -43,10 +43,7 @@ public class UserController {
     @Autowired
     PolicyMakerFeignService policyMakerFeignService;
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestParam("username") String username,
-            @RequestParam("password") String password) {
-
-        LoginDTO loginDTO = new LoginDTO(username, password);
+    public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO) {
 
         Map<String, Object> griddler = griddlerFeignService.findGriddler(loginDTO);
         System.out.println(griddler);

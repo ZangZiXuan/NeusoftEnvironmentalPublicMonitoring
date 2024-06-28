@@ -1,5 +1,6 @@
 package com.example.springcloudmessagegriddler.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.springcloudapi.dao.dto.AQIDTO;
 import com.example.springcloudapi.dao.entity.MessageGriddler;
@@ -121,28 +122,28 @@ public class MessageGriddlerController {
             Object messagePublicdata = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("data");
             System.out.println(messagePublicdata);
 
-            MessagePublic messagePublicObj = JSON.parseObject(JSON.toJSONString(messagePublic), MessagePublic.class);
+            MessagePublic messagePublic = JSON.parseObject(JSON.toJSONString(messagePublicdata), MessagePublic.class);
 
-//            Province province = (Province) citiesFeignService.selectProvince(messagePublic.getProvinceId()).get("data");
-//
-//            String provinceId = province.getId();
-//            MessageGriddlerDTO stats = provinceStats.getOrDefault(provinceId, new MessageGriddlerDTO(
-//                    provinceId,
-//                    province.getProvinceName(),
-//                    province.getShortTitle(),
-//                    0, 0, 0, 0
-//            ));
-//
-//            int co = messageGriddler.getCo();
-//            int pm = messageGriddler.getPm();
-//            int so2 = messageGriddler.getSo2();
-//
-//            if (co > 24) stats.setCoNum(stats.getCoNum() + 1);
-//            if (pm > 150) stats.setPmNum(stats.getPmNum() + 1);
-//            if (so2 > 800) stats.setSoNum(stats.getSoNum() + 1);
-//            stats.setAQINum(Math.max(Math.max(stats.getCoNum(),stats.getPmNum()),stats.getSoNum()));
-//
-//            provinceStats.put(provinceId, stats);
+            Province province = (Province) citiesFeignService.selectProvince(messagePublic.getProvinceId()).get("data");
+
+            String provinceId = province.getId();
+            MessageGriddlerDTO stats = provinceStats.getOrDefault(provinceId, new MessageGriddlerDTO(
+                    provinceId,
+                    province.getProvinceName(),
+                    province.getShortTitle(),
+                    0, 0, 0, 0
+            ));
+
+            int co = messageGriddler.getCo();
+            int pm = messageGriddler.getPm();
+            int so2 = messageGriddler.getSo2();
+
+            if (co > 24) stats.setCoNum(stats.getCoNum() + 1);
+            if (pm > 150) stats.setPmNum(stats.getPmNum() + 1);
+            if (so2 > 800) stats.setSoNum(stats.getSoNum() + 1);
+            stats.setAQINum(Math.max(Math.max(stats.getCoNum(),stats.getPmNum()),stats.getSoNum()));
+
+            provinceStats.put(provinceId, stats);
         }
 
         response.put("provinceStats", new ArrayList<>(provinceStats.values()));
