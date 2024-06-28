@@ -189,12 +189,14 @@ public class MessagePublicController {
     /**
      *
      * @param pubicId
+     * 注意这里面是所有的id，（唯一识别符号）
      * @return
      */
-    @GetMapping("/selectMessagePublic")
-    public Map<String,Object> selectMessagePublic(@RequestParam String pubicId) {
+    @PostMapping("/selectMessagePublic")
+    public Map<String,Object> selectMessagePublic(@RequestParam("publicId") String pubicId) {
         HashMap<String, Object> response = new HashMap<>();
-        List<MessagePublic> messagePublics = messagePublicMapper.selectList(Wrappers.<MessagePublic>lambdaQuery().eq(MessagePublic::getPublicId, pubicId));
+        List<MessagePublic> messagePublics = messagePublicMapper.selectList(Wrappers.<MessagePublic>lambdaQuery().eq(MessagePublic::getId, pubicId));
+
 
         if(messagePublics.isEmpty()) {
             response.put("success", false);
@@ -206,7 +208,7 @@ public class MessagePublicController {
         }else {
             response.put("success", true);
             response.put("message", "查询所有的公众监督员的提交记录成功");
-            response.put("data",messagePublics);
+            response.put("data",messagePublics.get(0));
             return response;
         }
     }

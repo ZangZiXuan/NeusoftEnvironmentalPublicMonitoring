@@ -103,40 +103,46 @@ public class MessageGriddlerController {
      * return ResponseEntity
      */
 
-    @RequestMapping("/viewProvinceSubgroup")
+    @GetMapping("/viewProvinceSubgroup")
     public Map<String, Object> viewProvinceSubgroup() {
         // 获取所有的MessageGriddler记录
         List<MessageGriddler> messageGriddlers = messageGriddlerMapper.selectList(
                 Wrappers.<MessageGriddler>lambdaQuery().eq(MessageGriddler::getStatus, 1)
         );
-
+        System.out.println(messageGriddlers);
         // 用于存储返回的数据
         HashMap<String, Object> response = new HashMap<>();
         // 用于存储统计结果
         Map<String, MessageGriddlerDTO> provinceStats = new HashMap<>();
 
         for (MessageGriddler messageGriddler : messageGriddlers) {
-            MessagePublic messagePublic = (MessagePublic) messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId());
-            Province province = (Province) citiesFeignService.selectProvince(messagePublic.getProvinceId()).get("data");
+            System.out.println(messageGriddler);
 
-            String provinceId = province.getId();
-            MessageGriddlerDTO stats = provinceStats.getOrDefault(provinceId, new MessageGriddlerDTO(
-                    provinceId,
-                    province.getProvinceName(),
-                    province.getShortTitle(),
-                    0, 0, 0, 0
-            ));
+            Object messagePublicdata = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("data");
+            System.out.println(messagePublicdata);
 
-            int co = messageGriddler.getCo();
-            int pm = messageGriddler.getPm();
-            int so2 = messageGriddler.getSo2();
+            MessagePublic messagePublicObj = JSON.parseObject(JSON.toJSONString(messagePublic), MessagePublic.class);
 
-            if (co > 24) stats.setCoNum(stats.getCoNum() + 1);
-            if (pm > 150) stats.setPmNum(stats.getPmNum() + 1);
-            if (so2 > 800) stats.setSoNum(stats.getSoNum() + 1);
-            stats.setAQINum(Math.max(Math.max(stats.getCoNum(),stats.getPmNum()),stats.getSoNum()));
-
-            provinceStats.put(provinceId, stats);
+//            Province province = (Province) citiesFeignService.selectProvince(messagePublic.getProvinceId()).get("data");
+//
+//            String provinceId = province.getId();
+//            MessageGriddlerDTO stats = provinceStats.getOrDefault(provinceId, new MessageGriddlerDTO(
+//                    provinceId,
+//                    province.getProvinceName(),
+//                    province.getShortTitle(),
+//                    0, 0, 0, 0
+//            ));
+//
+//            int co = messageGriddler.getCo();
+//            int pm = messageGriddler.getPm();
+//            int so2 = messageGriddler.getSo2();
+//
+//            if (co > 24) stats.setCoNum(stats.getCoNum() + 1);
+//            if (pm > 150) stats.setPmNum(stats.getPmNum() + 1);
+//            if (so2 > 800) stats.setSoNum(stats.getSoNum() + 1);
+//            stats.setAQINum(Math.max(Math.max(stats.getCoNum(),stats.getPmNum()),stats.getSoNum()));
+//
+//            provinceStats.put(provinceId, stats);
         }
 
         response.put("provinceStats", new ArrayList<>(provinceStats.values()));
