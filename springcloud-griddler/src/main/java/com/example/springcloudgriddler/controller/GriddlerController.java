@@ -37,7 +37,7 @@ public class GriddlerController {
         HashMap<String, Object> response = new HashMap<>();
         List<Griddler> griddlers = griddlerMapper.selectList(Wrappers.<Griddler>lambdaQuery()
                 .eq(Griddler::getCode, loginDTO.getUsername())
-                .eq(Griddler::getPassword, loginDTO.getPassword()));
+                .eq(Griddler::getPassword, MD5Util.encode(loginDTO.getPassword())));
 
         if(griddlers.isEmpty()) {
             response.put("message","登录者的身份不是网格员，或者如果他是网格员的话账户或者密码错误了");

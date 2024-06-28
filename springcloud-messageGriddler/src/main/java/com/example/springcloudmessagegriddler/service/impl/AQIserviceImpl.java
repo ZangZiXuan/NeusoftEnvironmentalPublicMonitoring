@@ -28,20 +28,21 @@ public class AQIserviceImpl implements AQIService {
     @Autowired
     private AQIMapper aqiMapper;
 
-    public List<AQIDTO>  getAQIDistribution() {
-        QueryWrapper<MessageGriddler> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("aqi_level", "COUNT(*) as countNum");
-        queryWrapper.groupBy("aqi_level");
-
-        List<MessageGriddler> messageList = messageGriddlerMapper.selectList(queryWrapper);
-
-        return messageList.stream().map(message -> {
-            AQIDTO dto = new AQIDTO();
-            dto.setAqiLevel(message.getAqiLevel());
-            AQI aqi = aqiMapper.selectById(message.getAqiLevel());
-            dto.setDescription(aqi != null ? aqi.getDescription() : "");
-            dto.setCountNum(message.getCountNum());
-            return dto;
-        }).collect(Collectors.toList());
-    }
+//    public List<AQIDTO>  getAQIDistribution() {
+//        QueryWrapper<MessageGriddler> queryWrapper = new QueryWrapper<>();
+//        queryWrapper.select("aqi_level", "COUNT(*) as countNum");
+//        queryWrapper.groupBy("aqi_level");
+//
+//        List<MessageGriddler> messageList = messageGriddlerMapper.selectList(queryWrapper);
+//
+//        return messageList.stream().map(message -> {
+//            AQIDTO dto = new AQIDTO();
+//            dto.setAqiLevel(message.getAqiLevel());
+//            AQI aqi = aqiMapper.selectById(message.getAqiLevel());
+//            dto.setDescription(aqi != null ? aqi.getDescription() : "");
+//            dto.setCountNum(message.getCountNum());
+//            return dto;
+//        }).collect(Collectors.toList());
+//    }
+//}
 }

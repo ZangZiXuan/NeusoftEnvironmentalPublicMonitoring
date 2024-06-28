@@ -8,8 +8,9 @@ import com.example.springcloudapi.dao.entity.Province;
 import com.example.springcloudapi.dao.entity.Public;
 import com.example.springcloudapi.mapper.CityMapper;
 import com.example.springcloudapi.mapper.ProvinceMapper;
+import com.example.springcloudapi.utils.UUIDUtil;
 import com.example.springcloudmessagepublic.feign.CitiesFeignService;
-import com.example.springcloudmessagepublic.feign.ProvinceFeignService;
+
 import com.example.springcloudmessagepublic.feign.PublicFeignService;
 import com.example.springcloudmessagepublic.mapper.MessagePublicMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +33,6 @@ public class MessagePublicController {
     @Autowired
     CitiesFeignService citiesFeignService;
     @Autowired
-    ProvinceFeignService provinceFeignService;
-    @Autowired
     PublicFeignService publicFeignService;
     /**
      * 公众监督员端的提交
@@ -43,6 +42,7 @@ public class MessagePublicController {
     @PostMapping("/submitMessagePublic")
     public Map<String, Object> submitMessagePublic(@RequestBody MessagePublic messagePublic) {
         Map<String, Object> response = new HashMap<>();
+        messagePublic.setId(UUID.randomUUID().toString());
         int insert = messagePublicMapper.insert(messagePublic);
         if(insert == 1){
             response.put("success", true);
@@ -75,7 +75,7 @@ public class MessagePublicController {
             for (MessagePublic messagePublic :
                     messagePublicList) {
                 City city = (City)citiesFeignService.selectCity(messagePublic.getCityId());
-                Province province = (Province) provinceFeignService.selectProvince(city.getProvinceId());
+                Province province = (Province) citiesFeignService.selectProvince(city.getProvinceId());
 
                 MessagePublicDTO messagePublicDTO = new MessagePublicDTO(
                   null,messagePublic,province.getProvinceName(),city.getCityName(), province.getShortTitle());
@@ -97,7 +97,7 @@ public class MessagePublicController {
      * 查看所有的用户的所有反馈信息
      * @return map
      */
-    @RequestMapping("/viewAllMessagePublic")
+    @GetMapping("/viewAllMessagePublic")
     public Map<String,Object> viewAllMessagePublic(){
         HashMap<String, Object> response = new HashMap<>();
         List<MessagePublic> messagePublicList = messagePublicMapper.selectList(null);
@@ -113,7 +113,7 @@ public class MessagePublicController {
 //City city = (City)citiesFeignService.selectCity(messagePublic.getCityId());
 //                Province province = (Province) provinceFeignService.selectProvince(city.getProvinceId());
                 City city = (City)citiesFeignService.selectCity(messagePublic.getCityId());
-                Province province = (Province) provinceFeignService.selectProvince(city.getProvinceId());
+                Province province = (Province) citiesFeignService.selectProvince(city.getProvinceId());
                 MessagePublicDTO messagePublicDTO = new MessagePublicDTO(
                         publicDetail,messagePublic, province.getProvinceName(), city.getCityName(), province.getShortTitle());
                 messagePublicDTOList.add(messagePublicDTO);
@@ -161,7 +161,7 @@ public class MessagePublicController {
             for (MessagePublic messagePublic :
                     messagePublicList) {
                 City city = (City)citiesFeignService.selectCity(messagePublic.getCityId());
-                Province province = (Province) provinceFeignService.selectProvince(city.getProvinceId());
+                Province province = (Province) citiesFeignService.selectProvince(city.getProvinceId());
 
                 String publicId = messagePublic.getPublicId();
                 /**
@@ -191,8 +191,8 @@ public class MessagePublicController {
      * @param pubicId
      * @return
      */
-    @RequestMapping("/selectMessagePublic")
-    public Map<String,Object> selectMessagePublic(@RequestParam("publicId") String pubicId) {
+    @GetMapping("/selectMessagePublic")
+    public Map<String,Object> selectMessagePublic(@RequestParam String pubicId) {
         HashMap<String, Object> response = new HashMap<>();
         List<MessagePublic> messagePublics = messagePublicMapper.selectList(Wrappers.<MessagePublic>lambdaQuery().eq(MessagePublic::getPublicId, pubicId));
 

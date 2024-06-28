@@ -13,8 +13,8 @@ import java.util.Map;
  * @Date 2024/6/26 16:02
  * @Version 1.0
  */
-@FeignClient(name = "cities-service",url = "localhost:8087")
+@FeignClient(name = "springcloud-messagePublic",url = "localhost:8087")
 public interface MessagePublicFeignService {
-    @GetMapping("/selectMessagePublic")
-    Map<String,Object> selectMessagePublic(@RequestParam("publicId") String publicId);
+    @GetMapping("/messagePublic/selectMessagePublic")
+    public Map<String,Object> selectMessagePublic(@RequestParam String publicId);
 }

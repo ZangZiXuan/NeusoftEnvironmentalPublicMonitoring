@@ -12,7 +12,7 @@ import com.example.springcloudmessagegriddler.feign.CitiesFeignService;
 import com.example.springcloudmessagegriddler.feign.MessagePublicFeignService;
 import com.example.springcloudmessagegriddler.mapper.AQIMapper;
 import com.example.springcloudmessagegriddler.mapper.MessageGriddlerMapper;
-import com.example.springcloudmessagegriddler.feign.ProvinceFeignService;
+
 import com.example.springcloudmessagegriddler.service.AQIService;
 import com.example.springcloudmessagepublic.mapper.MessagePublicMapper;
 import jakarta.annotation.Resource;
@@ -34,9 +34,6 @@ import java.util.*;
 public class MessageGriddlerController {
     @Autowired
     MessageGriddlerMapper messageGriddlerMapper;
-
-    @Autowired
-    ProvinceFeignService provinceFeignService;
     @Autowired
     MessagePublicFeignService messagePublicFeignService;
     @Autowired
@@ -120,7 +117,7 @@ public class MessageGriddlerController {
 
         for (MessageGriddler messageGriddler : messageGriddlers) {
             MessagePublic messagePublic = (MessagePublic) messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId());
-            Province province = (Province) provinceFeignService.selectProvince(messagePublic.getProvinceId()).get("data");
+            Province province = (Province) citiesFeignService.selectProvince(messagePublic.getProvinceId()).get("data");
 
             String provinceId = province.getId();
             MessageGriddlerDTO stats = provinceStats.getOrDefault(provinceId, new MessageGriddlerDTO(
@@ -162,15 +159,16 @@ public class MessageGriddlerController {
      * AQI空气质量指数级别分布
      *
      */
-    @Autowired
-    private AQIService aqiService;
-
-    @RequestMapping("/executeAQILevel")
-    public Map<String, Object> executeAQILevel() {
-        Map<String, Object> result = new HashMap<>();
-
-        result.put("data", aqiDistribution);
-        return result;
-    }
+//    @RequestMapping("/viewAQILevel")
+//    public Map<String,Object> ViewAQILevel() {
+//        List<MessageGriddler> messageGriddlers = messageGriddlerMapper.selectList(Wrappers.<MessageGriddler>lambdaQuery().eq(MessageGriddler::getStatus, 1));
+//        HashMap<String, Object> response = new HashMap<>();
+//        HashMap<Object, AQIDTO> AQILevelResult = new HashMap<>();
+//        for(MessageGriddler messageGriddler:messageGriddlers) {
+//
+//        }
+//
+//
+//    }
 }
 

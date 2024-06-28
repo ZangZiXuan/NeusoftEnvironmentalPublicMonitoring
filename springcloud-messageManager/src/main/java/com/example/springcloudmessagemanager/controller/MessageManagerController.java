@@ -1,5 +1,6 @@
 package com.example.springcloudmessagemanager.controller;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.springcloudapi.dao.entity.MessageManager;
 import com.example.springcloudmessagemanager.mapper.MessageManagerMapper;
 import jakarta.annotation.Resource;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,4 +70,16 @@ public class MessageManagerController {
             return ResponseEntity.badRequest().body(response);
         }
     }
+//    @RequestMapping("/viewOneGriddlerAssigned/{griddlerId}")
+//    public Map<String,Object> viewOneGriddlerAssigned(@PathVariable("griddlerId") String griddlerId) {
+//        List<MessageManager> messageManagerList = messageManagerMapper.selectList(Wrappers.<MessageManager>lambdaQuery()
+//                .eq(MessageManager::getGriddlerId, griddlerId));
+//        List<String> griddlerIdList = new ArrayList<>();
+//        for(int i = 0; i < messageManagerList.size(); i++) {
+//            griddlerIdList.add(messageManagerList.get(i).getGriddlerId());
+//
+//        }
+//
+////                MessageManager::getGriddlerId,griddlerId
+//    }
 }

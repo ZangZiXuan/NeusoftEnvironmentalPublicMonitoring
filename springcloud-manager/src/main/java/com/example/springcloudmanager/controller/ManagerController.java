@@ -3,6 +3,7 @@ package com.example.springcloudmanager.controller;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.springcloudapi.dao.dto.LoginDTO;
 import com.example.springcloudapi.dao.entity.Manager;
+import com.example.springcloudapi.utils.MD5Util;
 import com.example.springcloudmanager.mapper.ManagerMapper;
 import com.example.springcloudmanager.service.impl.ManagerServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class ManagerController {
     @PostMapping("/findManager")
     public Map<String, Object> findManager(@RequestBody LoginDTO loginDTO) {
         List<Manager> managers = managerMapper.selectList(Wrappers.<Manager>lambdaQuery().eq(Manager::getManagerCode, loginDTO.getUsername())
-                .eq(Manager::getPassword, loginDTO.getPassword()));
+                .eq(Manager::getPassword, MD5Util.encode(loginDTO.getPassword())));
         HashMap<String, Object> response = new HashMap<>();
         if(managers.isEmpty()) {
             response.put("message","登录者的身份不是管理员，或者如果他是管理员的话账户或者密码错误了");

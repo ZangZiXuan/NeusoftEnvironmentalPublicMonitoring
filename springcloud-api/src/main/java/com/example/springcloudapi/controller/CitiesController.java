@@ -7,9 +7,7 @@ import com.example.springcloudapi.dao.entity.Province;
 import com.example.springcloudapi.mapper.CityMapper;
 import com.example.springcloudapi.mapper.ProvinceMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,14 +19,15 @@ import java.util.Map;
  * @Version 1.0
  */
 @RestController
+@RequestMapping("/city")
 public class CitiesController {
     @Autowired
     CityMapper cityMapper;
     @Autowired
     ProvinceMapper provinceMapper;
 
-    @RequestMapping("/selectCity")
-    public Map<String,Object> selectCity(@RequestParam("cityId") String cityId) {
+    @PostMapping("/selectCity")
+    public Map<String,Object> selectCity(@RequestBody String cityId) {
         City city = cityMapper.selectOne(Wrappers.<City>lambdaQuery()
                 .eq(City::getId, cityId));
         Province province = provinceMapper.selectOne(Wrappers.<Province>lambdaQuery()

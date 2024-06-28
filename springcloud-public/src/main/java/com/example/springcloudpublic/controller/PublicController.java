@@ -9,10 +9,7 @@ import com.example.springcloudpublic.service.PublicService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +24,6 @@ import java.util.UUID;
  */
 @RestController
 @RequestMapping("/public")
-@RequiredArgsConstructor
 public class PublicController {
     @Autowired
     PublicMapper publicMapper;
@@ -41,7 +37,7 @@ public class PublicController {
     public Map<String,Object> findPublic(@RequestBody LoginDTO loginDTO) {
         List<Public> publics = publicMapper.selectList(Wrappers.<Public>lambdaQuery()
                 .eq(Public::getPassword, loginDTO.getPassword())
-                .eq(Public::getPhone, loginDTO.getUsername()));
+                .eq(Public::getPhone, MD5Util.encode(loginDTO.getUsername())));
         System.out.println(publics);
         HashMap<String, Object> response = new HashMap<>();
         if(publics.isEmpty()) {
@@ -67,7 +63,7 @@ public class PublicController {
 
     @PostMapping("/addPublic")
     public ResponseEntity<Map<String,Object>> addPublic(@RequestBody Public public1){
-        public1.setId(UUID.randomUUID().toString());
+        System.out.println("=-------------------");
         public1.setPassword(MD5Util.encode(public1.getPassword()));
         int insert = publicMapper.insert(public1);
         Map<String, Object> response = new HashMap<>();
@@ -83,9 +79,12 @@ public class PublicController {
             return ResponseEntity.badRequest().body(response);
         }
     }
-    @PostMapping ("/publicDetail")
+    @GetMapping ("/publicDetail")
     public Public getPublicById(@RequestBody String publicId) {
-        return publicMapper.selectById(publicId);
+        Public aPublic = publicMapper.selectOne(Wrappers.<Public>lambdaQuery()
+                .eq(Public::getId, publicId));
+        System.out.println(aPublic);
+        return aPublic;
     }
 
 }

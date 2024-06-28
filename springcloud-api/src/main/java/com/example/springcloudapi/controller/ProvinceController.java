@@ -19,12 +19,13 @@ import java.util.Map;
  * @Version 1.0
  */
 @RestController
+@RequestMapping("/province")
 public class ProvinceController {
     @Autowired
     ProvinceMapper provinceMapper;
 
     @PostMapping("/selectProvince")
-    public Map<String,Object> selectProvince(@RequestParam("provinceId") String provinceId) {
+    public Map<String,Object> selectProvince(@RequestBody String provinceId) {
         Province province = provinceMapper.selectOne(Wrappers.<Province>lambdaQuery().eq(Province::getId, provinceId));
         HashMap<String, Object> response = new HashMap<>();
         if(province != null) {

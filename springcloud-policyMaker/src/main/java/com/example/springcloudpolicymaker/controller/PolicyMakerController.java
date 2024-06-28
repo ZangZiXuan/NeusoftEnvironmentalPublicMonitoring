@@ -5,9 +5,11 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.example.springcloudapi.dao.dto.LoginDTO;
 import com.example.springcloudapi.dao.entity.PolicyMaker;
+import com.example.springcloudapi.utils.MD5Util;
 import com.example.springcloudpolicymaker.mapper.PolicyMakerMapper;
 import com.example.springcloudpolicymaker.service.impl.PolicyMakerServiceImpl;
 import org.apache.juli.logging.Log;
+import org.bouncycastle.jcajce.provider.digest.MD5;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +38,7 @@ public class PolicyMakerController {
 
         List<PolicyMaker> policyMakers = policyMakerMapper.selectList(Wrappers.<PolicyMaker>lambdaQuery()
                 .eq(PolicyMaker::getUsername, loginDTO.getUsername())
-                .eq(PolicyMaker::getPassword, loginDTO.getPassword()));
+                .eq(PolicyMaker::getPassword, MD5Util.encode(loginDTO.getPassword())));
         if (!policyMakers.isEmpty()) {
 //            PolicyMaker policyMaker = policyMakers.get(0);
             response.put("status", "success");

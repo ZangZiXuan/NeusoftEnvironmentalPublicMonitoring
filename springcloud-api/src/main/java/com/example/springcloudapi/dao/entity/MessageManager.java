@@ -25,7 +25,7 @@ public class MessageManager {
     @TableId(value = "id",type = IdType.ASSIGN_UUID)
     private String id;
     private String messageId;
-    private int griddlerId;
+    private String griddlerId;
     private int statusManager;
     private int provinceId;
     private int cityId;
