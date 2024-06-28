@@ -1,5 +1,6 @@
 package com.example.springcloudmessagegriddler.feign;
 
+import com.example.springcloudapi.dao.entity.AQI;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,4 +18,6 @@ public interface CitiesFeignService {
     public Map<String,Object> selectCity(@RequestBody String cityId);
     @PostMapping("/province/selectProvince")
     public Map<String,Object> selectProvince(@RequestBody String provinceId);
+    @PostMapping("/aqi/findAqiDetails")
+    public AQI findAqiDetails(@RequestBody String aqiLevel);
 }

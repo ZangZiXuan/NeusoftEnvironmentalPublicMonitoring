@@ -1,8 +1,10 @@
 package com.example.springcloudmessagegriddler.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.springcloudapi.dao.dto.AQIDTO;
+import com.example.springcloudapi.dao.entity.AQI;
 import com.example.springcloudapi.dao.entity.MessageGriddler;
 import com.example.springcloudapi.dao.dto.MessageGriddlerDTO;
 import com.example.springcloudapi.dao.entity.MessagePublic;
@@ -11,7 +13,7 @@ import com.example.springcloudapi.mapper.ProvinceMapper;
 import com.example.springcloudapi.utils.CommUtil;
 import com.example.springcloudmessagegriddler.feign.CitiesFeignService;
 import com.example.springcloudmessagegriddler.feign.MessagePublicFeignService;
-import com.example.springcloudmessagegriddler.mapper.AQIMapper;
+
 import com.example.springcloudmessagegriddler.mapper.MessageGriddlerMapper;
 
 import com.example.springcloudmessagegriddler.service.AQIService;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Author Zang Xinrui
@@ -40,8 +43,7 @@ public class MessageGriddlerController {
     MessagePublicFeignService messagePublicFeignService;
     @Autowired
     CitiesFeignService citiesFeignService;
-    @Autowired
-    AQIMapper aqiMapper;
+
     /**
      * 网格员确认提交数据
      */
@@ -167,16 +169,56 @@ public class MessageGriddlerController {
      * AQI空气质量指数级别分布
      *
      */
-//    @RequestMapping("/viewAQILevel")
-//    public Map<String,Object> ViewAQILevel() {
-//        List<MessageGriddler> messageGriddlers = messageGriddlerMapper.selectList(Wrappers.<MessageGriddler>lambdaQuery().eq(MessageGriddler::getStatus, 1));
-//        HashMap<String, Object> response = new HashMap<>();
-//        HashMap<Object, AQIDTO> AQILevelResult = new HashMap<>();
-//        for(MessageGriddler messageGriddler:messageGriddlers) {
-//
-//        }
-//
-//
-//    }
+    @RequestMapping("/viewAQILevel")
+    public Map<String,Object> ViewAQILevel() {
+        ArrayList<AQIDTO> list = new ArrayList<>();
+        HashMap<String, Object> response = new HashMap<>();
+        for(int i = 1;i <=6;i++) {
+            int num = Integer.parseInt(messageGriddlerMapper.selectCount(Wrappers.<MessageGriddler>lambdaQuery()
+                    .eq(MessageGriddler::getAqiLevel, i)
+                    .eq(MessageGriddler::getStatus, 1)).toString());
+            AQI aqiDetails = citiesFeignService.findAqiDetails(String.valueOf(i));
+            AQIDTO aqidto = new AQIDTO(i, aqiDetails.getDescription(), num);
+            list.add(aqidto);
+        }
+        if(list.isEmpty()) {
+            response.put("data",null);
+            response.put("success",true);
+            response.put("message","统计AQI空气质量指数级别分布成功");
+            return response;
+        }else {
+            response.put("data",list);
+            response.put("success",false);
+            response.put("message","统计AQI空气质量指数级别分布失败");
+            return response;
+        }
+    }
+
+    /**
+     *
+     * 管理员端
+     * AQI空气质量指数超标数量统计表
+     * @return
+     */
+    @GetMapping("AqiLevelOver")
+    public Map<String,Object> AqiLevelOver() {
+        LambdaQueryWrapper<MessageGriddler> queryWrapper = Wrappers.lambdaQuery();
+
+        messageGriddlerMapper.selectList(Wrappers.<MessageGriddler>lambdaQuery()
+                .gt)
+        queryWrapper.gt(MessageGriddler::getAqiLevel, 3)
+                .select(MessageGriddler::getTime);
+
+        List<MessageGriddler> list = this.list(queryWrapper);
+
+        // 通过 Java 流处理逐月分组和统计
+        Map<String, Long> result = list.stream()
+                .collect(Collectors.groupingBy(
+                        mg -> String.format("%d-%02d", mg.getTime().getYear() + 1900, mg.getTime().getMonth() + 1),
+                        Collectors.counting()
+                ));
+
+        return result;
+    }
 }
 

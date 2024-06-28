@@ -43,7 +43,8 @@ public class UserController {
     @Autowired
     PolicyMakerFeignService policyMakerFeignService;
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO) {
+    public Map<String,Object> login(@RequestBody LoginDTO loginDTO) {
+        HashMap<String, Object> response = new HashMap<>();
 
         Map<String, Object> griddler = griddlerFeignService.findGriddler(loginDTO);
         System.out.println(griddler);
@@ -77,18 +78,17 @@ public class UserController {
             dept.setUser(data);
         }
 
-        HashMap<String, Object> response = new HashMap<>();
         if(dept.getDname()== null) {
             response.put("message","账号或密码错误");
             response.put("success",false);
-
+            response.put("data",null);
             //返回 400 Bad Request 表示请求不合法.(待推敲哪个状态码更合适)
-            return ResponseEntity.badRequest().body(response);
+            return response;
         }else {
             response.put("data",dept);
             response.put("success", true);
             response.put("message", "登录成功");
-            return ResponseEntity.ok(response);
+            return response;
         }
     }
 }

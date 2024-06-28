@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.springcloudapi.dao.dto.AQIDTO;
 import com.example.springcloudapi.dao.entity.AQI;
 import com.example.springcloudapi.dao.entity.MessageGriddler;
-import com.example.springcloudmessagegriddler.mapper.AQIMapper;
+
 import com.example.springcloudmessagegriddler.mapper.MessageGriddlerMapper;
 import com.example.springcloudmessagegriddler.service.AQIService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +22,8 @@ import java.util.stream.Collectors;
 @Service
 public class AQIserviceImpl implements AQIService {
 
-    @Autowired
-    private MessageGriddlerMapper messageGriddlerMapper;
 
-    @Autowired
-    private AQIMapper aqiMapper;
+
 
 //    public List<AQIDTO>  getAQIDistribution() {
 //        QueryWrapper<MessageGriddler> queryWrapper = new QueryWrapper<>();

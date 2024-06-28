@@ -1,13 +1,14 @@
-package com.example.springcloudmessagegriddler.mapper;
+package com.example.springcloudapi.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.example.springcloudapi.dao.entity.AQI;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.tomcat.websocket.BackgroundProcess;
 
 /**
  * @Author Zang Xinrui
  * @Description TODO
- * @Date 2024/6/27 11:16
+ * @Date 2024/6/28 17:05
  * @Version 1.0
  */
 @Mapper
