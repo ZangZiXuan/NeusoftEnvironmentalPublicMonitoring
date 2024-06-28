@@ -16,6 +16,7 @@ import com.example.springcloudmessagegriddler.mapper.MessageGriddlerMapper;
 
 import com.example.springcloudmessagegriddler.service.AQIService;
 import com.example.springcloudmessagepublic.mapper.MessagePublicMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -117,14 +118,14 @@ public class MessageGriddlerController {
         Map<String, MessageGriddlerDTO> provinceStats = new HashMap<>();
 
         for (MessageGriddler messageGriddler : messageGriddlers) {
-            System.out.println(messageGriddler);
 
-            Object messagePublicdata = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("data");
-            System.out.println(messagePublicdata);
+            Object messagePublic1 = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("data");
+            ObjectMapper objectMapper = new ObjectMapper();
+            MessagePublic messagePublic = objectMapper.convertValue(messagePublic1, MessagePublic.class);
 
-            MessagePublic messagePublic = JSON.parseObject(JSON.toJSONString(messagePublicdata), MessagePublic.class);
-
-            Province province = (Province) citiesFeignService.selectProvince(messagePublic.getProvinceId()).get("data");
+            Object province1 = citiesFeignService.selectProvince(messagePublic.getProvinceId()).get("data");
+            ObjectMapper objectMapper2 = new ObjectMapper();
+            Province province = objectMapper2.convertValue(province1, Province.class);
 
             String provinceId = province.getId();
             MessageGriddlerDTO stats = provinceStats.getOrDefault(provinceId, new MessageGriddlerDTO(

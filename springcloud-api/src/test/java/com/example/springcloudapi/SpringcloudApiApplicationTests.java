@@ -12,7 +12,7 @@ class SpringcloudApiApplicationTests {
     }
     @Test
     void MD5() {
-        String s = "1";
+        String s = "123456";
 
         System.out.println("---------------");
         System.out.println(MD5Util.encode(s));

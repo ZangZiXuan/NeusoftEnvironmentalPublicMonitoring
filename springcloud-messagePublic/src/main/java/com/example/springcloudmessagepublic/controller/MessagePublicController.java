@@ -207,7 +207,7 @@ public class MessagePublicController {
 
         }else {
             response.put("success", true);
-            response.put("message", "查询所有的公众监督员的提交记录成功");
+            response.put("message", "某个id的公众监督员记录");
             response.put("data",messagePublics.get(0));
             return response;
         }

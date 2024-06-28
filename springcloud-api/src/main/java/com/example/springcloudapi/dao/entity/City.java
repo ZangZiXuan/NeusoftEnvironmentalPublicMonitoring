@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 @TableName("cities")
 public class City {
     private String id;
+    private String cityId;
     private String cityName;
     private String provinceId;
 }

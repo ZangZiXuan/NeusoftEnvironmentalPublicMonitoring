@@ -1,5 +1,6 @@
 package com.example.springcloudapi.dao.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,6 +18,9 @@ import lombok.NoArgsConstructor;
 @TableName("provinces")
 public class Province {
     private String id;
+    private String provinceId;
+
     private String provinceName;
+    @TableField("province_abbreviation")
     private String shortTitle;
 }
