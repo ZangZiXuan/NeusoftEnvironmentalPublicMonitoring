@@ -78,8 +78,8 @@ public class UserController {
             dept.setUser(data);
         }
 
-        if(dept.getDname()== "public" &&  dept.getDname()== "policyMaker"
-        && dept.getDname()== "manager" && dept.getDname()== "griddler") {
+        if(dept.getDname()!= "public" &&  dept.getDname()!= "policyMaker"
+        && dept.getDname()!= "manager" && dept.getDname()!= "griddler") {
             response.put("message","账号或密码错误");
             response.put("success",false);
             response.put("data",null);
