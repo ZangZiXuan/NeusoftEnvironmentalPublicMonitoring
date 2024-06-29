@@ -1,5 +1,6 @@
 package com.example.springcloudapi.dao.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,7 +25,8 @@ public class AQI {
 
     private String aqiId;
     private String description;
-    private String apiDescription;
+
+    private String aqiDescription;
     private String color;
     private String healthImpact;
     private String measures;

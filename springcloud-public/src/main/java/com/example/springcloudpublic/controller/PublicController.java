@@ -65,19 +65,32 @@ public class PublicController {
     public ResponseEntity<Map<String,Object>> addPublic(@RequestBody Public public1){
         System.out.println("=-------------------");
         public1.setPassword(MD5Util.encode(public1.getPassword()));
-        int insert = publicMapper.insert(public1);
+        List<Public> publics = publicMapper.selectList(Wrappers.<Public>lambdaQuery().eq(Public::getPhone, public1.getPhone()));
         Map<String, Object> response = new HashMap<>();
+        if(publics.isEmpty()){
+            int insert = publicMapper.insert(public1);
 
-        if(insert == 1){
-            response.put("success", true);
-            response.put("message", "注册公众监督员成功");
-            return ResponseEntity.ok(response);
+
+            if(insert == 1){
+                response.put("success", true);
+                response.put("message", "注册公众监督员成功");
+                response.put("data",public1);
+                return ResponseEntity.ok(response);
+            }else {
+                response.put("success", false);
+                response.put("message", "注册公众监督员失败");
+                response.put("data",null);
+                //返回 400 Bad Request 表示请求不合法.(待推敲哪个状态码更合适)
+                return ResponseEntity.badRequest().body(response);
+            }
         }else {
             response.put("success", false);
-            response.put("message", "注册公众监督员失败");
+            response.put("message", "注册公众监督员失败,当前电话已经注册了");
+            response.put("data",null);
             //返回 400 Bad Request 表示请求不合法.(待推敲哪个状态码更合适)
             return ResponseEntity.badRequest().body(response);
         }
+
     }
     @GetMapping ("/publicDetail")
     public Public getPublicById(@RequestBody String publicId) {

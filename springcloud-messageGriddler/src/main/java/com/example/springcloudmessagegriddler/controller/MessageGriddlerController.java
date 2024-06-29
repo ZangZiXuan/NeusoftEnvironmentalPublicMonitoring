@@ -189,13 +189,13 @@ public class MessageGriddlerController {
             response.put("data",null);
             response.put("success",true);
             response.put("result",result);
-            response.put("message","统计AQI空气质量指数级别分布成功");
+            response.put("message","统计AQI空气质量指数级别分布失败");
             return response;
         }else {
             response.put("data",list);
             response.put("success",false);
-            response.put("result",null);
-            response.put("message","统计AQI空气质量指数级别分布失败");
+            response.put("result",result);
+            response.put("message","统计AQI空气质量指数级别分布成功");
             return response;
         }
     }
