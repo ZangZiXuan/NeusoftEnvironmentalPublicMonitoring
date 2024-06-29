@@ -18,6 +18,4 @@ public class PlaceDTO {
     private String provinceId;
     private String cityId;
 
-
-
 }

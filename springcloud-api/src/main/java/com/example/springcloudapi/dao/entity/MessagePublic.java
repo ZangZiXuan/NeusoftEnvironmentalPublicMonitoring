@@ -31,6 +31,7 @@ public class MessagePublic {
     private String cityId;
     private String address;
     private int level;
+
     private String description;
     private Date date;
     /**

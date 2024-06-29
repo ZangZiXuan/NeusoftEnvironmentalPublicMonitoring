@@ -180,14 +180,21 @@ public class MessageGriddlerController {
             AQIDTO aqidto = new AQIDTO(i, aqiDetails.getDescription(), num);
             list.add(aqidto);
         }
+
+        Map<String, Integer> result = Map.of("one", list.get(0).getCountNum(),"two",list.get(1).getCountNum()
+                , "three", list.get(2).getCountNum(),
+                "four", list.get(3).getCountNum(), "five",list.get(4).getCountNum(),
+                "six", list.get(5).getCountNum());
         if(list.isEmpty()) {
             response.put("data",null);
             response.put("success",true);
+            response.put("result",result);
             response.put("message","统计AQI空气质量指数级别分布成功");
             return response;
         }else {
             response.put("data",list);
             response.put("success",false);
+            response.put("result",null);
             response.put("message","统计AQI空气质量指数级别分布失败");
             return response;
         }
