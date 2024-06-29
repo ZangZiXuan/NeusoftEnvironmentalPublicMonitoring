@@ -187,13 +187,13 @@ public class MessageGriddlerController {
                 "six", list.get(5).getCountNum());
         if(list.isEmpty()) {
             response.put("data",null);
-            response.put("success",true);
+            response.put("success",false);
             response.put("result",result);
             response.put("message","统计AQI空气质量指数级别分布失败");
             return response;
         }else {
             response.put("data",list);
-            response.put("success",false);
+            response.put("success",true);
             response.put("result",result);
             response.put("message","统计AQI空气质量指数级别分布成功");
             return response;
@@ -269,6 +269,12 @@ public class MessageGriddlerController {
         int countBigCity = countCommonElements(allBigCity, allAddressByCity);
         double bigCityLevel = countBigCity / 391;
         result.put("大城市覆盖范围",bigCityLevel);
+//                Map<String, String> result = Map.
+//                of("provinces", String.format("%.2f", (double)provinceList.size() / 34.0 * 100),
+//                "cities", String.format("%.2f", (double)cityList.size() / cityService.count() * 100));
+//        Map<String,String> coverage = Map.of("province",String.format("%.2f", (double)provinceList.size() / 34.0 * 100),)
+
+
         if(result.isEmpty()) {
             response.put("data",null);
             response.put("success",false);
