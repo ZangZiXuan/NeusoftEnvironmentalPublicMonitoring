@@ -36,8 +36,8 @@ public class PublicController {
     @PostMapping("/findPublic")
     public Map<String,Object> findPublic(@RequestBody LoginDTO loginDTO) {
         List<Public> publics = publicMapper.selectList(Wrappers.<Public>lambdaQuery()
-                .eq(Public::getPassword, loginDTO.getPassword())
-                .eq(Public::getPhone, MD5Util.encode(loginDTO.getUsername())));
+                .eq(Public::getPassword, MD5Util.encode(loginDTO.getPassword()))
+                .eq(Public::getPhone, loginDTO.getUsername()));
         System.out.println(publics);
         HashMap<String, Object> response = new HashMap<>();
         if(publics.isEmpty()) {
