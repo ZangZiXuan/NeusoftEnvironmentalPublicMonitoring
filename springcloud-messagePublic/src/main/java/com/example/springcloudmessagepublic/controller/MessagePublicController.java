@@ -13,6 +13,7 @@ import com.example.springcloudapi.mapper.ProvinceMapper;
 import com.example.springcloudapi.utils.HttpResponseEntity;
 import com.example.springcloudapi.utils.UUIDUtil;
 import com.example.springcloudmessagepublic.dto.DigitalMessagePublicDTO;
+import com.example.springcloudmessagepublic.dto.ViewAllMessagePublicDataFrame;
 import com.example.springcloudmessagepublic.feign.CitiesFeignService;
 
 import com.example.springcloudmessagepublic.feign.PublicFeignService;
@@ -107,34 +108,43 @@ public class MessagePublicController {
     @PostMapping("/viewAllMessagePublic")
     public Map<String,Object> viewAllMessagePublic(){
         HashMap<String, Object> response = new HashMap<>();
+//        List<ViewAllMessagePublicDataFrame> finalResult = new ArrayList<>();
         List<MessagePublic> messagePublicList = messagePublicMapper.selectList(null);
         List<MessagePublicDTO> messagePublicDTOList = new ArrayList<>();
         if(!messagePublicList.isEmpty()) {
             for (MessagePublic messagePublic :
                     messagePublicList) {
                 String publicId = messagePublic.getPublicId();
-                System.out.println(publicId);
+
                 /**
                  * 从查询public的具体信息
                  */
                 Public publicDetail = publicFeignService.getPublicById(publicId);
+                System.out.println(publicDetail);
 //City city = (City)citiesFeignService.selectCity(messagePublic.getCityId());
 //                Province province = (Province) provinceFeignService.selectProvince(city.getProvinceId());
                 String city = citiesFeignService.selectCityName(messagePublic.getCityId()).toString();
                 System.out.println(city);
-
                 Object data1 = citiesFeignService.selectProvince(messagePublic.getProvinceId()).get("data");
                 System.out.println(data1);
                 ObjectMapper objectMapper1 = new ObjectMapper();
                 Province province = objectMapper1.convertValue(data1, Province.class);
 
                 MessagePublicDTO messagePublicDTO = new MessagePublicDTO(
-                        publicDetail,messagePublic, province.getProvinceName(),city, province.getShortTitle());
+                        publicDetail,messagePublic, province.getProvinceName(),
+                        city, province.getShortTitle());
+
                 messagePublicDTOList.add(messagePublicDTO);
+//                String[] s1 = messagePublic.getDate().toString().split(" ");
+
+//                finalResult.add(new ViewAllMessagePublicDataFrame(messagePublic.getId(),
+//                        publicDetail.getName(), province.getProvinceName(),
+//                        city,messagePublic.getLevel(),s1[0],s1[1]));
             }
             response.put("success", true);
             response.put("message", "查询所有的公众监督员的提交记录成功");
             response.put("data",messagePublicDTOList);
+//            response.put("result",finalResult);
             return response;
         }else {
             response.put("success", false);
