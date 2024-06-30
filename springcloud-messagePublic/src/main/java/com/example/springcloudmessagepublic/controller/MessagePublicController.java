@@ -229,6 +229,32 @@ public class MessagePublicController {
         return list;
     }
 
-
+    /**
+     * 全部的信息记录条数
+     * @return
+     */
+    @GetMapping("/countMessagePublic")
+    public int countMessagePublic() {
+        int size = messagePublicMapper.selectList(null).size();
+        return size;
+    }
+    /**
+     * 未指派的信息记录条数
+     */
+    @GetMapping("/countUnGriddler")
+    public int countUnGriddler() {
+        int size = messagePublicMapper.selectList(Wrappers.<MessagePublic>lambdaQuery()
+                .eq(MessagePublic::getStatus, 1)).size();
+        return size;
+    }
+    /**
+     * 等待指派的信息记录条数
+     */
+    @GetMapping("/countAlreadyAssigned")
+    public int countAlreadyAssigned() {
+        int size = messagePublicMapper.selectList(Wrappers.<MessagePublic>lambdaQuery()
+                .eq(MessagePublic::getStatus, 0)).size();
+        return size;
+    }
 }
 

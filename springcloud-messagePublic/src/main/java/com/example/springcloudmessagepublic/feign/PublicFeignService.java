@@ -1,6 +1,8 @@
 package com.example.springcloudmessagepublic.feign;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.springcloudapi.dao.dto.LoginDTO;
+import com.example.springcloudapi.dao.entity.MessagePublic;
 import com.example.springcloudapi.dao.entity.Public;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -18,4 +20,5 @@ import java.util.Map;
 public interface PublicFeignService {
     @GetMapping ("/public/publicDetail")
     public Public getPublicById(@RequestBody String publicId) ;
+
 }

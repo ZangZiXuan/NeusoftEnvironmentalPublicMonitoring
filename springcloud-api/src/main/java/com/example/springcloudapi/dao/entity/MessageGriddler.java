@@ -30,6 +30,7 @@ public class MessageGriddler {
     private String id;
     @TableField("message_public_id")
     private String messagePublicId;
+    private String griddlerId;
     private int so2;
     private int co;
     private int pm;

@@ -5,13 +5,17 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.springcloudapi.dao.dto.AQIDTO;
+import com.example.springcloudapi.dao.dto.PlaceDTO;
 import com.example.springcloudapi.dao.entity.*;
 import com.example.springcloudapi.dao.dto.MessageGriddlerDTO;
 import com.example.springcloudapi.mapper.ProvinceMapper;
 import com.example.springcloudapi.utils.CommUtil;
+import com.example.springcloudapi.utils.HttpResponseEntity;
+import com.example.springcloudmessagegriddler.dto.DigitalScreenMessageGriddler;
 import com.example.springcloudmessagegriddler.feign.CitiesFeignService;
 import com.example.springcloudmessagegriddler.feign.MessagePublicFeignService;
 
+import com.example.springcloudmessagegriddler.feign.PublicFeignService;
 import com.example.springcloudmessagegriddler.mapper.MessageGriddlerMapper;
 
 import com.example.springcloudmessagegriddler.service.AQIService;
@@ -24,6 +28,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.http.HttpResponse;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,9 +55,11 @@ public class MessageGriddlerController {
     @PostMapping("/creatMessageGriddler")
     public Map<String,Object> creatMessageGriddler(@RequestParam("co") int co,
             @RequestParam("pm") int pm,@RequestParam("so2") int so2,
-            @RequestParam("message_public_id") String messagePublicId,@RequestParam("aqi_level") int aqiLevel) {
+            @RequestParam("message_public_id") String messagePublicId
+            ,@RequestParam("aqi_level") int aqiLevel,
+            @RequestParam("griddler_id") String griddlerId){
         MessageGriddler messageGriddler = new MessageGriddler(
-                UUID.randomUUID().toString(),messagePublicId,so2,co,pm,
+                UUID.randomUUID().toString(),messagePublicId,griddlerId,so2,co,pm,
                 CommUtil.getNowDateLongStr("yyyy-mm-dd HH:mm:ss"),1,aqiLevel
         );
         int insert = messageGriddlerMapper.insert(messageGriddler);
@@ -298,6 +305,54 @@ public class MessageGriddlerController {
 
         // 交集的大小就是两个列表中相同字符串的数量
         return set1.size();
+    }
+
+
+
+    @GetMapping("/getProcession")
+    public HttpResponseEntity getProcession() {
+        Map<String, Integer> result = new HashMap<>();
+        int countMessagePublic = messagePublicFeignService.countMessagePublic();
+        int countAlreadyAssigned = messagePublicFeignService.countAlreadyAssigned();
+        int countUnGriddler = messagePublicFeignService.countUnGriddler();
+        int submission = Integer.parseInt(messageGriddlerMapper.selectCount(Wrappers.<MessageGriddler>lambdaQuery()
+                .eq(MessageGriddler::getStatus, 1)).toString());
+        result.put("report",countMessagePublic);
+        result.put("task",countAlreadyAssigned);
+        result.put("submission",submission);
+        return HttpResponseEntity.response(true, "get procession", result);
+    }
+    @Autowired
+    PublicFeignService publicFeignService;
+
+    @GetMapping("/digitalScreenShowMessageGriddler")
+    public HttpResponseEntity digitalScreenShowMessageGriddler(@RequestParam("limitNum") Integer num ) {
+        if(num <= 0) return HttpResponseEntity.error("限制条数出现错误，请检查后重试");
+        QueryWrapper<MessageGriddler> queryWrapper = new QueryWrapper<>();
+        List<MessageGriddler> messageGriddlerList = messageGriddlerMapper.selectList(queryWrapper.orderByDesc("time"));
+        List<DigitalScreenMessageGriddler> result = new ArrayList<>();
+        boolean success = !messageGriddlerList.isEmpty();
+        if(success) {
+            int count = 0;
+            for(MessageGriddler messageGriddler: messageGriddlerList) {
+                if(count >= num) {
+                    break;
+                }else {
+                    Object data = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("data");
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    MessagePublic messagePublic = objectMapper.convertValue(data, MessagePublic.class);
+                    Object data1 = citiesFeignService.selectCity(messagePublic.getCityId()).get("data");
+                    ObjectMapper objectMapper1 = new ObjectMapper();
+                    PlaceDTO placeDTO = objectMapper1.convertValue(data1, PlaceDTO.class);
+                    DigitalScreenMessageGriddler digitalScreenMessageGriddler = new DigitalScreenMessageGriddler(messageGriddler.getGriddlerId(), messageGriddler.getAqiLevel()
+                            , messageGriddler.getTime(), placeDTO.getProvinceId(), placeDTO.getCityId());
+                    result.add(digitalScreenMessageGriddler);
+                    count++;
+                }
+            }
+        }
+
+        return HttpResponseEntity.response(success,"query",result);
     }
 }
 

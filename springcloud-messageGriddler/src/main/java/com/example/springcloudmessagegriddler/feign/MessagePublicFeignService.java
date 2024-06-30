@@ -1,5 +1,7 @@
 package com.example.springcloudmessagegriddler.feign;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.example.springcloudapi.dao.entity.MessagePublic;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,4 +24,21 @@ public interface MessagePublicFeignService {
 
     @GetMapping("/messagePublic/findAllAddressByCityId")
     public List<String> findAllAddressByCity();
+
+    /**
+     * 全部的信息记录条数
+     * @return
+     */
+    @GetMapping("/messagePublic/countMessagePublic")
+    public int countMessagePublic() ;
+    /**
+     * 未指派的信息记录条数
+     */
+    @GetMapping("/messagePublic/countUnGriddler")
+    public int countUnGriddler() ;
+    /**
+     * 等待指派的信息记录条数
+     */
+    @GetMapping("/messagePublic/countAlreadyAssigned")
+    public int countAlreadyAssigned();
 }
