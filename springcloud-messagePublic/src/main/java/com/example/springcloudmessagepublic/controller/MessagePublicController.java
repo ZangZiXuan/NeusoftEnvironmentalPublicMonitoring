@@ -1,5 +1,6 @@
 package com.example.springcloudmessagepublic.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.springcloudapi.dao.entity.MessagePublic;
 import com.example.springcloudapi.dao.dto.MessagePublicDTO;
@@ -8,11 +9,15 @@ import com.example.springcloudapi.dao.entity.Province;
 import com.example.springcloudapi.dao.entity.Public;
 import com.example.springcloudapi.mapper.CityMapper;
 import com.example.springcloudapi.mapper.ProvinceMapper;
+import com.example.springcloudapi.utils.HttpResponseEntity;
 import com.example.springcloudapi.utils.UUIDUtil;
+import com.example.springcloudmessagepublic.dto.DigitalMessagePublicDTO;
 import com.example.springcloudmessagepublic.feign.CitiesFeignService;
 
 import com.example.springcloudmessagepublic.feign.PublicFeignService;
 import com.example.springcloudmessagepublic.mapper.MessagePublicMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -131,7 +136,34 @@ public class MessagePublicController {
             return response;
         }
     }
+    @GetMapping("/selectMessagePublicDigitalScreen")
+    public HttpResponseEntity selectMessagePublicDigitalScreen(@RequestParam("limitNum") Integer limitNum) {
+        if(limitNum == null || limitNum < 1) return HttpResponseEntity.error("限制的条数不合法请稍后再试");
+        QueryWrapper<MessagePublic> queryWrapper = new QueryWrapper<>();
+        List<MessagePublic> messagePublicList = messagePublicMapper.selectList(queryWrapper.orderByDesc("date"));
+        ArrayList<DigitalMessagePublicDTO> result = new ArrayList<>();
+        for(MessagePublic messagePublic:messagePublicList) {
+            Object data = citiesFeignService.selectProvince(messagePublic.getProvinceId()).get("data");
+            ObjectMapper objectMapper = new ObjectMapper();
+            Province province = objectMapper.convertValue(data, Province.class);
+            String provinceName = province.getProvinceName();
+            String cityName = citiesFeignService.selectCityName(messagePublic.getCityId());
+            String address = messagePublic.getAddress();
+            Date date = messagePublic.getDate();
+            String publicId = messagePublic.getPublicId();
+            Integer aqiLevel = messagePublic.getLevel();
+            result.add(new DigitalMessagePublicDTO(provinceName,cityName,address,date,publicId,aqiLevel,messagePublic.getDescription()));
+        }
+        return HttpResponseEntity.success("query ", result);
+    }
 
+//        List<ResponseReportEntity> result = new ArrayList<>();
+//        for(int i = 0; i < limitNum && i < reportList.size(); i++){
+//            City city = cityService.getCityById(reportList.get(i).getCityId());
+//            result.add(new ResponseReportEntity(reportList.get(i), city));
+//        }
+//        return HttpResponseEntity.success("query ", result);
+//    }
     /**
      * 通过特定的筛选条件，找到符合要求的信息
      * @param provinceId

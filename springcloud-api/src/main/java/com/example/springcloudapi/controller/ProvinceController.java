@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Wrapper;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,5 +42,15 @@ public class ProvinceController {
             //返回 400 Bad Request 表示请求不合法.(待推敲哪个状态码更合适)
             return response;
         }
+    }
+
+    @GetMapping("/selectAllProvince")
+    public List<String> selectProvince() {
+        List<Province> provinces = provinceMapper.selectList(null);
+        ArrayList<String> list = new ArrayList<>();
+        for(Province province:provinces) {
+            list.add(province.getProvinceName());
+        }
+        return list;
     }
 }

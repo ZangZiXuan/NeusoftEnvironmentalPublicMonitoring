@@ -78,4 +78,9 @@ public class CitiesController {
                 .collect(Collectors.toList());
         return capitalCityIds;
     }
+    @GetMapping("/selectCityName")
+    public String selectCityName(@RequestParam("cityId") String cityId) {
+        City city = cityMapper.selectOne(Wrappers.<City>lambdaQuery().eq(City::getId, cityId));
+        return city.getCityName();
+    }
 }

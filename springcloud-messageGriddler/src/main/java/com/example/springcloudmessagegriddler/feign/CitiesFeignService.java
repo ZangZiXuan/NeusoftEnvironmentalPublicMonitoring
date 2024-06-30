@@ -19,6 +19,8 @@ public interface CitiesFeignService {
     public Map<String,Object> selectCity(@RequestBody String cityId);
     @PostMapping("/province/selectProvince")
     public Map<String,Object> selectProvince(@RequestBody String provinceId);
+    @GetMapping("/city/selectCityName")
+    public String selectCityName(@RequestParam("cityId") String cityId);
     @PostMapping("/aqi/findAqiDetails")
     public AQI findAqiDetails(@RequestBody String aqiLevel);
 
@@ -26,4 +28,9 @@ public interface CitiesFeignService {
     public List<String> findAllCapitalCity();
     @GetMapping("/city/findAllBigCity")
     public List<String> findAllBigCity();
+
+
+    @GetMapping("/selectAllProvince")
+    public List<String> selectProvince();
+
 }

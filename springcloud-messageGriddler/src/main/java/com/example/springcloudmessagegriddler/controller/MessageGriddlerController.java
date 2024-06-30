@@ -156,6 +156,12 @@ public class MessageGriddlerController {
         }
 
         response.put("provinceStats", new ArrayList<>(provinceStats.values()));
+
+//        result.put("pm25", pm25Count);
+//        result.put("so2", so2Count);
+//        result.put("co", coCount);
+//        result.put("aqi", AQICount);
+
         if(provinceStats.isEmpty()) {
             response.put("success", false);
             response.put("message", "查看省分组分项检查统计数据失败");
@@ -270,26 +276,27 @@ public class MessageGriddlerController {
         List<String> allCapitalCity = citiesFeignService.findAllCapitalCity();
         List<String> allAddressByCity = messagePublicFeignService.findAllAddressByCity();
         int countCapitalCity = countCommonElements(allCapitalCity, allAddressByCity);
-        double capitalCityLevel = countCapitalCity / 34;
+        double capitalCityLevel = countCapitalCity / 34.0;
         result.put("省会城市网格覆盖范围",capitalCityLevel);
         List<String> allBigCity = citiesFeignService.findAllBigCity();
         int countBigCity = countCommonElements(allBigCity, allAddressByCity);
-        double bigCityLevel = countBigCity / 391;
+        double bigCityLevel = countBigCity / 391.0;
         result.put("大城市覆盖范围",bigCityLevel);
-//                Map<String, String> result = Map.
-//                of("provinces", String.format("%.2f", (double)provinceList.size() / 34.0 * 100),
-//                "cities", String.format("%.2f", (double)cityList.size() / cityService.count() * 100));
-//        Map<String,String> coverage = Map.of("province",String.format("%.2f", (double)provinceList.size() / 34.0 * 100),)
+        Map<String, String> result1 = Map.of(
+                "provinces", String.format("%.2f", capitalCityLevel * 100),
+                "cities", String.format("%.2f", bigCityLevel * 100));
 
 
         if(result.isEmpty()) {
             response.put("data",null);
             response.put("success",false);
+            response.put("result",null);
             response.put("message","获取其他统计信息失败");
             return response;
         } else {
             response.put("data",result);
             response.put("success",true);
+            response.put("result",result1);
             response.put("message","获取其他统计信息成功");
             return response;
         }
@@ -344,15 +351,79 @@ public class MessageGriddlerController {
                     Object data1 = citiesFeignService.selectCity(messagePublic.getCityId()).get("data");
                     ObjectMapper objectMapper1 = new ObjectMapper();
                     PlaceDTO placeDTO = objectMapper1.convertValue(data1, PlaceDTO.class);
+                    Object data2 = citiesFeignService.selectProvince(placeDTO.getProvinceId()).get("data");
+                    ObjectMapper objectMapper2 = new ObjectMapper();
+                    Province province = objectMapper2.convertValue(data2, Province.class);
+
                     DigitalScreenMessageGriddler digitalScreenMessageGriddler = new DigitalScreenMessageGriddler(messageGriddler.getGriddlerId(), messageGriddler.getAqiLevel()
-                            , messageGriddler.getTime(), placeDTO.getProvinceId(), placeDTO.getCityId());
+                            , messageGriddler.getTime(), province.getProvinceName(), citiesFeignService.selectCityName(placeDTO.getCityId()),
+                            messagePublic.getAddress());
+
                     result.add(digitalScreenMessageGriddler);
                     count++;
                 }
             }
         }
-
         return HttpResponseEntity.response(success,"query",result);
     }
+    /**
+     * 中国地图！！！！！
+     */
+//    @GetMapping("/AQIRegionalDistributionChina")
+//    public HttpResponseEntity AQIRegionalDistributionChina(@RequestParam("province") String provinceId) {
+//
+//    }
+
+///**
+ //     * get the record of the latest limitNum records within the latest week
+ //     * @Request_character function getWeeklyAirData
+ //     * @return the record of the latest limitNum records within the latest week
+ //     */
+//    private Map<String, Integer> getWeeklyAirData_China(){
+//        LocalDateTime now = LocalDateTime.now();
+//        LocalDateTime oneWeekAgo = now.minusWeeks(1);
+//
+//        QueryWrapper<AirData> queryWrapper = new QueryWrapper<>();
+//        queryWrapper.between("date", oneWeekAgo, now);
+//        List<AirData> airDataList = airDataService.list(queryWrapper.orderByDesc("aqi"));
+//
+//        Map<String, Integer> maxAqiByProvince = new HashMap<>();
+//        for(AirData airData : airDataList){
+//            String province = cityService.getCityById(airData.getCityId()).getProvince();
+//            if(maxAqiByProvince.containsKey(province)) {
+//                if (airData.getAqi() > maxAqiByProvince.get(province))
+//                    maxAqiByProvince.put(province, airData.getAqi());
+//            }
+//            else
+//                maxAqiByProvince.put(province, airData.getAqi());
+//        }
+//        return maxAqiByProvince;
+//    }
+    /**
+     * 各省地图
+     */
+//        /**
+//     * get the record of the latest limitNum records within the latest week
+//     * @Request_character digitalScreen
+//     * @param encodedProvince the province name using Base64 encoder to be queried(use request parameter to transmit)
+//     * @return the record of the latest limitNum records within the latest week
+//     */
+//    @GetMapping("/digitalScreen/WeeklyAirData")
+//    public HttpResponseEntity getWeeklyAirData(@RequestParam("province") String encodedProvince) {
+//        String province = "";
+//        if(encodedProvince != null)
+//            province = Base64Util.decodeBase64ToString(encodedProvince);
+//        Map<String, Integer> data = null;
+//        if(province.equals("china"))
+//            data = getWeeklyAirData_China();
+//        else
+//            data = getWeeklyAirData_Province(province);
+//        List<Map<String, Object>> result = new ArrayList<>();
+//        for(String key : data.keySet())
+//            result.add(Map.of("name", key, "value", data.get(key)));
+//        return HttpResponseEntity.success("get weekly air data", result);
+//    }
+//
+//
 }
 

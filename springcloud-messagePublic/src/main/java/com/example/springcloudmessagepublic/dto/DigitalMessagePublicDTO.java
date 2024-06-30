@@ -1,4 +1,4 @@
-package com.example.springcloudmessagegriddler.dto;
+package com.example.springcloudmessagepublic.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,18 +9,18 @@ import java.util.Date;
 /**
  * @Author Zang Xinrui
  * @Description TODO
- * @Date 2024/6/30 10:56
+ * @Date 2024/6/30 21:39
  * @Version 1.0
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DigitalScreenMessageGriddler {
-    private String griddlerId;
-    private int aqiLevel;
-    private Date dateTime;
+public class DigitalMessagePublicDTO {
     private String provinceName;
     private String cityName;
     private String address;
-
+    private Date date;
+    private String publicId;
+    private Integer aqiLevel;
+    private String description;
 }
