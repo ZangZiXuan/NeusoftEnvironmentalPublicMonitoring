@@ -2,6 +2,7 @@ package com.example.springcloudmessagepublic.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.example.springcloudapi.dao.dto.PlaceDTO;
 import com.example.springcloudapi.dao.entity.MessagePublic;
 import com.example.springcloudapi.dao.dto.MessagePublicDTO;
 import com.example.springcloudapi.dao.entity.City;
@@ -103,7 +104,7 @@ public class MessagePublicController {
      * 查看所有的用户的所有反馈信息
      * @return map
      */
-    @GetMapping("/viewAllMessagePublic")
+    @PostMapping("/viewAllMessagePublic")
     public Map<String,Object> viewAllMessagePublic(){
         HashMap<String, Object> response = new HashMap<>();
         List<MessagePublic> messagePublicList = messagePublicMapper.selectList(null);
@@ -112,16 +113,23 @@ public class MessagePublicController {
             for (MessagePublic messagePublic :
                     messagePublicList) {
                 String publicId = messagePublic.getPublicId();
+                System.out.println(publicId);
                 /**
                  * 从查询public的具体信息
                  */
                 Public publicDetail = publicFeignService.getPublicById(publicId);
 //City city = (City)citiesFeignService.selectCity(messagePublic.getCityId());
 //                Province province = (Province) provinceFeignService.selectProvince(city.getProvinceId());
-                City city = (City)citiesFeignService.selectCity(messagePublic.getCityId());
-                Province province = (Province) citiesFeignService.selectProvince(city.getProvinceId());
+                String city = citiesFeignService.selectCityName(messagePublic.getCityId()).toString();
+                System.out.println(city);
+
+                Object data1 = citiesFeignService.selectProvince(messagePublic.getProvinceId()).get("data");
+                System.out.println(data1);
+                ObjectMapper objectMapper1 = new ObjectMapper();
+                Province province = objectMapper1.convertValue(data1, Province.class);
+
                 MessagePublicDTO messagePublicDTO = new MessagePublicDTO(
-                        publicDetail,messagePublic, province.getProvinceName(), city.getCityName(), province.getShortTitle());
+                        publicDetail,messagePublic, province.getProvinceName(),city, province.getShortTitle());
                 messagePublicDTOList.add(messagePublicDTO);
             }
             response.put("success", true);

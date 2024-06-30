@@ -21,4 +21,6 @@ public interface CitiesFeignService {
     public Map<String,Object> selectProvince(@RequestBody String provinceId);
     @GetMapping("/city/selectCityName")
     public String selectCityName(@RequestParam("cityId") String cityId);
+
+
 }

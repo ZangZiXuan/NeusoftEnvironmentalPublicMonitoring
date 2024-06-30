@@ -92,7 +92,7 @@ public class PublicController {
         }
 
     }
-    @GetMapping ("/publicDetail")
+    @PostMapping ("/publicDetail")
     public Public getPublicById(@RequestBody String publicId) {
         Public aPublic = publicMapper.selectOne(Wrappers.<Public>lambdaQuery()
                 .eq(Public::getId, publicId));

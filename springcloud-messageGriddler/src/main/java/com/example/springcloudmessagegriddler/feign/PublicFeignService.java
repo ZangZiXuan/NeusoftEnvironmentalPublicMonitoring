@@ -3,6 +3,7 @@ package com.example.springcloudmessagegriddler.feign;
 import com.example.springcloudapi.dao.entity.Public;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 /**
@@ -13,6 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
  */
 @FeignClient(name = "springcloud-Public",url = "localhost:8089")
 public interface PublicFeignService {
-    @GetMapping("/publicDetail")
+    @PostMapping("/publicDetail")
     public Public getPublicById(@RequestBody String publicId);
 }
