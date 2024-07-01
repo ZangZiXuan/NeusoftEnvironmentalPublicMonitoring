@@ -386,10 +386,12 @@ public class MessageGriddlerController {
             Object data = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("data");
             ObjectMapper objectMapper = new ObjectMapper();
             MessagePublic messagePublic = objectMapper.convertValue(data, MessagePublic.class);
+            System.out.println(messagePublic);
             Object data1 = citiesFeignService.selectProvince(messagePublic.getProvinceId()).get("data");
             ObjectMapper objectMapper1 = new ObjectMapper();
             Province province1 = objectMapper1.convertValue(data1, Province.class);
             String province = province1.getProvinceName();
+            System.out.println(province);
             if(maxAqiByProvince.containsKey(province)) {
                 if(messageGriddler.getAqiLevel() > maxAqiByProvince.get(province)) {
                     maxAqiByProvince.put(province,messageGriddler.getAqiLevel());
@@ -408,66 +410,33 @@ public class MessageGriddlerController {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime oneWeekAgo = now.minusWeeks(1);
         List<String> citiesByProvinceId = citiesFeignService.getCitiesByProvinceId(province);
-
-        Map<String, Integer> maxAqiByCity = new HashMap<>();
-
-        if (citiesByProvinceId == null || citiesByProvinceId.isEmpty()) {
-            // If there are no cities, return an empty map
-            return maxAqiByCity;
-        }
-
         QueryWrapper<MessageGriddler> queryWrapper = new QueryWrapper<>();
         queryWrapper.between("time", oneWeekAgo, now);
         queryWrapper.in("city_id", citiesByProvinceId);
-        List<MessageGriddler> messageGriddlerList = messageGriddlerMapper.selectList(queryWrapper.orderByDesc("aqi_level"));
-
-        for (MessageGriddler messageGriddler : messageGriddlerList) {
+        List<MessageGriddler> messageGriddlerList = messageGriddlerMapper.selectList(
+                queryWrapper.orderByDesc("aqi_level"));
+//        messageGriddlerMapper.selectList(Wrappers.<MessageGriddler>lambdaQuery().eq()
+        Map<String, Integer> maxAqiByCity = new HashMap<>();
+        for(MessageGriddler messageGriddler: messageGriddlerList) {
             Object data = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("data");
             ObjectMapper objectMapper = new ObjectMapper();
             MessagePublic messagePublic = objectMapper.convertValue(data, MessagePublic.class);
             String city = citiesFeignService.selectCityName(messagePublic.getCityId());
-
-            maxAqiByCity.put(city,messageGriddler.getAqiLevel());
+            if(maxAqiByCity.containsKey(city)) {
+                if(messageGriddler.getAqiLevel()>maxAqiByCity.get(city)) {
+                    maxAqiByCity.put(city,messageGriddler.getAqiLevel());
+                }
+            } else {
+                maxAqiByCity.put(city,messageGriddler.getAqiLevel());
+            }
         }
-
         return maxAqiByCity;
     }
 
-//    private Map<String, Integer> getWeeklyAirData_Province(String province) {
-//        LocalDateTime now = LocalDateTime.now();
-//        LocalDateTime oneWeekAgo = now.minusWeeks(1);
-//        List<String> citiesByProvinceId = citiesFeignService.getCitiesByProvinceId(province);
-//        QueryWrapper<MessageGriddler> queryWrapper = new QueryWrapper<>();
-//        queryWrapper.between("time", oneWeekAgo, now);
-//        queryWrapper.in("city_id", citiesByProvinceId);
-//        List<MessageGriddler> messageGriddlerList = messageGriddlerMapper.selectList(queryWrapper.orderByDesc("aqi_level"));
-//        Map<String, Integer> maxAqiByCity = new HashMap<>();
-//        for(MessageGriddler messageGriddler: messageGriddlerList) {
-//            Object data = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("data");
-//            ObjectMapper objectMapper = new ObjectMapper();
-//            MessagePublic messagePublic = objectMapper.convertValue(data, MessagePublic.class);
-//            String city = citiesFeignService.selectCityName(messagePublic.getCityId());
-//            if(maxAqiByCity.containsKey(city)) {
-//                if(messageGriddler.getAqiLevel()>maxAqiByCity.get(city)) {
-//                    maxAqiByCity.put(city,messageGriddler.getAqiLevel());
-//                }
-//            } else {
-//                maxAqiByCity.put(city,messageGriddler.getAqiLevel());
-//            }
-//        }
-//        return maxAqiByCity;
-//    }
-
-        /**
-     * get the record of the latest limitNum records within the latest week
-     * @Request_character digitalScreen
-     * @param encodedProvince the province name using Base64 encoder to be queried(use request parameter to transmit)
-     * @return the record of the latest limitNum records within the latest week
-     */
 
    @GetMapping("/AQIRegionalDistributionChina")
-    public HttpResponseEntity AQIRegionalDistributionChina(@RequestParam("province") String encodedProvince) {
-        String province = encodedProvince;
+    public HttpResponseEntity AQIRegionalDistributionChina(@RequestParam("province") String province) {
+       System.out.println(province);
         Map<String, Integer> data = null;
         if(province.equals("china"))
             data = AQIRegionalDistribution();
@@ -504,5 +473,27 @@ public class MessageGriddlerController {
             return response;
         }
     }
+
+    /**
+     * 统计各个地区出现优的概率
+     * 找到空气质量最好的10个城市
+     *
+     */
+//    @GetMapping("/selectTopCity")
+//    public HttpResponseEntity selectTopCity(@RequestParam("limitNum") Integer limitNum) {
+//        if(limitNum == null || limitNum < 1)
+//            return HttpResponseEntity.error("limitNum is not valid");
+//        QueryWrapper<MessageGriddler> queryWrapper = new QueryWrapper<>();
+//
+//    }
+
+//        List<Report> reportList = reportService.list(queryWrapper.orderByDesc("created_time"));
+//        List<ResponseReportEntity> result = new ArrayList<>();
+//        for(int i = 0; i < limitNum && i < reportList.size(); i++){
+//            City city = cityService.getCityById(reportList.get(i).getCityId());
+//            result.add(new ResponseReportEntity(reportList.get(i), city));
+//        }
+//        return HttpResponseEntity.success("query ", result);
+//    }
 }
 
