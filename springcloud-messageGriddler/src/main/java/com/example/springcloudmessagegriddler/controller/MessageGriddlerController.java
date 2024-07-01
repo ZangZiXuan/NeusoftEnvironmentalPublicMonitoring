@@ -346,16 +346,20 @@ public class MessageGriddlerController {
                 if(count >= num) {
                     break;
                 }else {
+                    System.out.println(messageGriddler.getMessagePublicId());
                     Object data = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("data");
+                    System.out.println("data:"+data);
                     ObjectMapper objectMapper = new ObjectMapper();
                     MessagePublic messagePublic = objectMapper.convertValue(data, MessagePublic.class);
+                    System.out.println(messagePublic);
                     Object data1 = citiesFeignService.selectCity(messagePublic.getCityId()).get("data");
                     ObjectMapper objectMapper1 = new ObjectMapper();
                     PlaceDTO placeDTO = objectMapper1.convertValue(data1, PlaceDTO.class);
+                    System.out.println(placeDTO);
                     Object data2 = citiesFeignService.selectProvince(placeDTO.getProvinceId()).get("data");
                     ObjectMapper objectMapper2 = new ObjectMapper();
                     Province province = objectMapper2.convertValue(data2, Province.class);
-
+                    System.out.println(province);
                     DigitalScreenMessageGriddler digitalScreenMessageGriddler = new DigitalScreenMessageGriddler(messageGriddler.getGriddlerId(), messageGriddler.getAqiLevel()
                             , messageGriddler.getTime(), province.getProvinceName(), citiesFeignService.selectCityName(placeDTO.getCityId()),
                             messagePublic.getAddress());
@@ -368,9 +372,8 @@ public class MessageGriddlerController {
         return HttpResponseEntity.response(success,"query",result);
     }
     /**
-     * 中国地图！！！！！
+     * 中国地图
      */
-    @GetMapping("/AQIRegionalDistribution")
     private Map<String,Integer> AQIRegionalDistribution() {
 
         LocalDateTime now = LocalDateTime.now();
@@ -398,21 +401,69 @@ public class MessageGriddlerController {
         return maxAqiByProvince;
     }
 
-//            else
-//                maxAqiByProvince.put(province, airData.getAqi());
-//        }
-//        return maxAqiByProvince;
-//    }
     /**
      * 各省地图
      */
+    private Map<String, Integer> getWeeklyAirData_Province(String province) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime oneWeekAgo = now.minusWeeks(1);
+        List<String> citiesByProvinceId = citiesFeignService.getCitiesByProvinceId(province);
 
-//        /**
-//     * get the record of the latest limitNum records within the latest week
-//     * @Request_character digitalScreen
-//     * @param encodedProvince the province name using Base64 encoder to be queried(use request parameter to transmit)
-//     * @return the record of the latest limitNum records within the latest week
-//     */
+        Map<String, Integer> maxAqiByCity = new HashMap<>();
+
+        if (citiesByProvinceId == null || citiesByProvinceId.isEmpty()) {
+            // If there are no cities, return an empty map
+            return maxAqiByCity;
+        }
+
+        QueryWrapper<MessageGriddler> queryWrapper = new QueryWrapper<>();
+        queryWrapper.between("time", oneWeekAgo, now);
+        queryWrapper.in("city_id", citiesByProvinceId);
+        List<MessageGriddler> messageGriddlerList = messageGriddlerMapper.selectList(queryWrapper.orderByDesc("aqi_level"));
+
+        for (MessageGriddler messageGriddler : messageGriddlerList) {
+            Object data = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("data");
+            ObjectMapper objectMapper = new ObjectMapper();
+            MessagePublic messagePublic = objectMapper.convertValue(data, MessagePublic.class);
+            String city = citiesFeignService.selectCityName(messagePublic.getCityId());
+
+            maxAqiByCity.put(city,messageGriddler.getAqiLevel());
+        }
+
+        return maxAqiByCity;
+    }
+
+//    private Map<String, Integer> getWeeklyAirData_Province(String province) {
+//        LocalDateTime now = LocalDateTime.now();
+//        LocalDateTime oneWeekAgo = now.minusWeeks(1);
+//        List<String> citiesByProvinceId = citiesFeignService.getCitiesByProvinceId(province);
+//        QueryWrapper<MessageGriddler> queryWrapper = new QueryWrapper<>();
+//        queryWrapper.between("time", oneWeekAgo, now);
+//        queryWrapper.in("city_id", citiesByProvinceId);
+//        List<MessageGriddler> messageGriddlerList = messageGriddlerMapper.selectList(queryWrapper.orderByDesc("aqi_level"));
+//        Map<String, Integer> maxAqiByCity = new HashMap<>();
+//        for(MessageGriddler messageGriddler: messageGriddlerList) {
+//            Object data = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("data");
+//            ObjectMapper objectMapper = new ObjectMapper();
+//            MessagePublic messagePublic = objectMapper.convertValue(data, MessagePublic.class);
+//            String city = citiesFeignService.selectCityName(messagePublic.getCityId());
+//            if(maxAqiByCity.containsKey(city)) {
+//                if(messageGriddler.getAqiLevel()>maxAqiByCity.get(city)) {
+//                    maxAqiByCity.put(city,messageGriddler.getAqiLevel());
+//                }
+//            } else {
+//                maxAqiByCity.put(city,messageGriddler.getAqiLevel());
+//            }
+//        }
+//        return maxAqiByCity;
+//    }
+
+        /**
+     * get the record of the latest limitNum records within the latest week
+     * @Request_character digitalScreen
+     * @param encodedProvince the province name using Base64 encoder to be queried(use request parameter to transmit)
+     * @return the record of the latest limitNum records within the latest week
+     */
 
    @GetMapping("/AQIRegionalDistributionChina")
     public HttpResponseEntity AQIRegionalDistributionChina(@RequestParam("province") String encodedProvince) {
@@ -420,37 +471,14 @@ public class MessageGriddlerController {
         Map<String, Integer> data = null;
         if(province.equals("china"))
             data = AQIRegionalDistribution();
-//        else
-//            data = getWeeklyAirData_Province(province);
+        else
+            data = getWeeklyAirData_Province(province);
         List<Map<String, Object>> result = new ArrayList<>();
         for(String key : data.keySet())
             result.add(Map.of("name", key, "value", data.get(key)));
         return HttpResponseEntity.success("get weekly air data", result);
     }
 
-//    private Map<String, Integer> getWeeklyAirData_Province(String province) {
-//        LocalDateTime now = LocalDateTime.now();
-//        LocalDateTime oneWeekAgo = now.minusWeeks(1);
-//
-//        List<Integer> citiesId = cityService.getCitiesIdByProvince(province);
-//
-//        QueryWrapper<MessageGriddler> queryWrapper = new QueryWrapper<>();
-//        queryWrapper.between("time", oneWeekAgo, now);
-//        queryWrapper.in("city_id", citiesId);
-//        List<AirData> airDataList = airDataService.list(queryWrapper.orderByDesc("aqi_level"));
-//
-//        Map<String, Integer> maxAqiByCity = new HashMap<>();
-//        for(AirData airData : airDataList){
-//            String city = cityService.getCityById(airData.getCityId()).getName();
-//            if(maxAqiByCity.containsKey(city)){
-//                if(airData.getAqi() > maxAqiByCity.get(city))
-//                    maxAqiByCity.put(city, airData.getAqi());
-//            }
-//            else
-//                maxAqiByCity.put(city, airData.getAqi());
-//        }
-//        return maxAqiByCity;
-//    }
     /**
      * 待做任务列表
      */

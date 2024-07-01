@@ -20,7 +20,7 @@ import java.util.Map;
 @FeignClient(name = "springcloud-messagePublic",url = "localhost:8087")
 public interface MessagePublicFeignService {
     @PostMapping("/messagePublic/selectMessagePublic")
-    public Map<String,Object> selectMessagePublic(@RequestParam("publicId") String publicId);
+    public Map<String,Object> selectMessagePublic(@RequestParam("messageId") String messageId);
 
     @GetMapping("/messagePublic/findAllAddressByCityId")
     public List<String> findAllAddressByCity();

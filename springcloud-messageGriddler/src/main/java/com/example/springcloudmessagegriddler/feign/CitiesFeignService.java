@@ -30,7 +30,8 @@ public interface CitiesFeignService {
     public List<String> findAllBigCity();
 
 
-    @GetMapping("/selectAllProvince")
+    @GetMapping("/province/selectAllProvince")
     public List<String> selectProvince();
-
+    @GetMapping("/city/selectCitiesByProvince")
+    public List<String> getCitiesByProvinceId(@RequestParam("provinceId") String provinceId);
 }

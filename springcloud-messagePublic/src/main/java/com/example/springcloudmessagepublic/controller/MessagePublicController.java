@@ -255,7 +255,7 @@ public class MessagePublicController {
         List<MessagePublic> messagePublics = messagePublicMapper.selectList(
                 Wrappers.<MessagePublic>lambdaQuery().eq(MessagePublic::getId, messageId));
 
-
+        MessagePublic messagePublic = messagePublics.get(0);
         if(messagePublics.isEmpty()) {
             response.put("success", false);
             response.put("message", "当前用户还未提交过反馈信息");
@@ -266,7 +266,7 @@ public class MessagePublicController {
         }else {
             response.put("success", true);
             response.put("message", "某个id的公众监督员记录");
-            response.put("data",messagePublics.get(0));
+            response.put("data",messagePublic);
             return response;
         }
     }

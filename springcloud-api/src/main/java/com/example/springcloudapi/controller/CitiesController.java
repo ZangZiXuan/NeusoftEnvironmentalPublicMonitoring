@@ -87,4 +87,11 @@ public class CitiesController {
 //    public List<String> selectCitiesByProvince(@RequestParam("provinceId") String provinceId) {
 //
 ////    }
+    @GetMapping("/selectCitiesByProvince")
+    public List<String> getCitiesByProvinceId(@RequestParam("provinceId") String provinceId) {
+        QueryWrapper<City> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("province_id", provinceId);
+        List<City> cities = cityMapper.selectList(queryWrapper);
+        return cities.stream().map(City::getCityName).collect(Collectors.toList());
+    }
 }
