@@ -75,7 +75,7 @@ public class MessagePublicController {
     @GetMapping("/ViewMyMessagePublic/{publicId}")
     public Map<String,Object> ViewMyMessagePublic(@PathVariable("publicId") String publicId) {
         Map<String, Object> response = new HashMap<>();
-
+        Public publicById = publicFeignService.getPublicById(publicId);
         List<MessagePublic> messagePublicList = messagePublicMapper.selectList
                 (Wrappers.<MessagePublic>lambdaQuery().eq(MessagePublic::getPublicId, publicId));
         List<MessagePublicDTO> messagePublicDTOList = new ArrayList<>();
@@ -92,7 +92,7 @@ public class MessagePublicController {
                 ObjectMapper objectMapper1 = new ObjectMapper();
                 Province province = objectMapper1.convertValue(data1, Province.class);
                 MessagePublicDTO messagePublicDTO = new MessagePublicDTO(
-                  null,messagePublic,province.getProvinceName(),citiesFeignService.selectCityName(placeDTO.getCityId()), placeDTO.getShortTitle());
+                        publicById,messagePublic,province.getProvinceName(),citiesFeignService.selectCityName(placeDTO.getCityId()), placeDTO.getShortTitle());
                 messagePublicDTOList.add(messagePublicDTO);
             }
             response.put("success", true);
@@ -245,14 +245,15 @@ public class MessagePublicController {
 
     /**
      *
-     * @param pubicId
+     * @param messageId
      * 注意这里面是所有的id，（唯一识别符号）
      * @return
      */
     @PostMapping("/selectMessagePublic")
-    public Map<String,Object> selectMessagePublic(@RequestParam("publicId") String pubicId) {
+    public Map<String,Object> selectMessagePublic(@RequestParam("messageId") String messageId) {
         HashMap<String, Object> response = new HashMap<>();
-        List<MessagePublic> messagePublics = messagePublicMapper.selectList(Wrappers.<MessagePublic>lambdaQuery().eq(MessagePublic::getId, pubicId));
+        List<MessagePublic> messagePublics = messagePublicMapper.selectList(
+                Wrappers.<MessagePublic>lambdaQuery().eq(MessagePublic::getId, messageId));
 
 
         if(messagePublics.isEmpty()) {

@@ -27,7 +27,7 @@ public class MessageManager {
     private String messageId;
     private String griddlerId;
     private int statusManager;
-    private int provinceId;
-    private int cityId;
-
+    private String provinceId;
+    private String cityId;
+    private int status;
 }

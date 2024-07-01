@@ -43,6 +43,11 @@ public class ProvinceController {
             return response;
         }
     }
+    @GetMapping("/selectprovinceName")
+    public String selectProvinceName(@RequestParam("provinceId") String provinceId) {
+        String provinceName = provinceMapper.selectOne(Wrappers.<Province>lambdaQuery().eq(Province::getProvinceId, provinceId)).getProvinceName();
+        return provinceName;
+    }
 
     @GetMapping("/selectAllProvince")
     public List<String> selectProvince() {

@@ -1,18 +1,22 @@
 package com.example.springcloudmessagemanager.controller;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.example.springcloudapi.dao.dto.MessagePublicDTO;
 import com.example.springcloudapi.dao.entity.MessageManager;
+import com.example.springcloudapi.dao.entity.MessagePublic;
+import com.example.springcloudmessagemanager.dto.ShowDetailDTO;
+import com.example.springcloudmessagemanager.feign.CitiesFeignService;
+import com.example.springcloudmessagemanager.feign.MessageGriddlerFeignService;
+import com.example.springcloudmessagemanager.feign.MessagePublicFeignService;
 import com.example.springcloudmessagemanager.mapper.MessageManagerMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Author Zang Xinrui
@@ -70,16 +74,56 @@ public class MessageManagerController {
             return ResponseEntity.badRequest().body(response);
         }
     }
-//    @RequestMapping("/viewOneGriddlerAssigned/{griddlerId}")
-//    public Map<String,Object> viewOneGriddlerAssigned(@PathVariable("griddlerId") String griddlerId) {
-//        List<MessageManager> messageManagerList = messageManagerMapper.selectList(Wrappers.<MessageManager>lambdaQuery()
-//                .eq(MessageManager::getGriddlerId, griddlerId));
-//        List<String> griddlerIdList = new ArrayList<>();
-//        for(int i = 0; i < messageManagerList.size(); i++) {
-//            griddlerIdList.add(messageManagerList.get(i).getGriddlerId());
-//
-//        }
-//
-////                MessageManager::getGriddlerId,griddlerId
-//    }
+    @Autowired
+    MessagePublicFeignService messagePublicFeignService;
+    @Autowired
+    CitiesFeignService citiesFeignService;
+    @Autowired
+    MessageGriddlerFeignService messageGriddlerFeignService;
+    @GetMapping("/viewOneGriddlerAssigned/{griddlerId}")
+    public Map<String,Object> viewOneGriddlerAssigned(@PathVariable("griddlerId") String griddlerId) {
+        List<MessageManager> messageManagerList = messageManagerMapper.selectList(Wrappers.
+                <MessageManager>lambdaQuery()
+                .eq(MessageManager::getGriddlerId, griddlerId)
+                        .eq(MessageManager::getStatus,0)
+                );
+
+        List<ShowDetailDTO> list = new ArrayList<>();
+        HashMap<String, Object> response = new HashMap<>();
+        for(MessageManager messageManager:messageManagerList) {
+
+            Object response1 = messagePublicFeignService.selectMessagePublic(messageManager.getMessageId());
+            // 获取data部分
+            Map<String, Object> responseMap = (Map<String, Object>) response1;
+            Object data = responseMap.get("data");
+
+
+            // 检查data是否为空
+            if (data != null) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                MessagePublic messagePublic = objectMapper.convertValue(data, MessagePublic.class);
+
+                String provinceName = citiesFeignService.selectProvinceName(messagePublic.getProvinceId());
+                String cityName = citiesFeignService.selectCityName(messagePublic.getCityId());
+                int level = messagePublic.getLevel();
+                String address = messagePublic.getAddress();
+                Date date = messagePublic.getDate();
+                ShowDetailDTO showDetailDTO = new ShowDetailDTO(provinceName, cityName, level, address, date);
+
+                list.add(showDetailDTO);
+            }
+        }
+        if(!list.isEmpty()) {
+            response.put("success", true);
+            response.put("message", "查看待做任务成功");
+            response.put("data",list);
+            return response;
+        }else {
+            response.put("success", false);
+            response.put("message", "查看待做任务失败");
+            response.put("data",null);
+            return response;
+        }
+    }
+
 }

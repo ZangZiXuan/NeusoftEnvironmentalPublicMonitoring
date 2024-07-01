@@ -85,7 +85,7 @@ public class MessageGriddlerController {
 
     @GetMapping("/viewAllMessageGriddler")
     public Map<String,Object> viewAllMessageGriddler() {
-        List<MessageGriddler> messageGriddlerList = messageGriddlerMapper.selectList(null);
+        List<MessageGriddler> messageGriddlerList = messageGriddlerMapper.selectList(Wrappers.<MessageGriddler>lambdaQuery().eq(MessageGriddler::getStatus,1));
 
         Map<String, Object> response = new HashMap<>();
 
@@ -451,5 +451,30 @@ public class MessageGriddlerController {
 //        }
 //        return maxAqiByCity;
 //    }
+    /**
+     * 待做任务列表
+     */
+    @GetMapping("/viewAllMessageGriddlerUndo")
+    public Map<String,Object> viewMessageGriddlerUndo(@RequestParam("griddlerId") String griddler) {
+        List<MessageGriddler> messageGriddlerList = messageGriddlerMapper.
+                selectList(Wrappers.<MessageGriddler>lambdaQuery().
+                        eq(MessageGriddler::getStatus,0)
+                        .eq(MessageGriddler::getGriddlerId,griddler));
+
+        Map<String, Object> response = new HashMap<>();
+
+        if(!messageGriddlerList.isEmpty()){
+            response.put("success", true);
+            response.put("message", "查看所有的网格员端待做");
+            response.put("data",messageGriddlerList);
+            return response;
+        }else {
+            response.put("success", false);
+            response.put("message", "查看所有的网格员端的提交实测数据失败");
+            response.put("data",null);
+            //返回 400 Bad Request 表示请求不合法.(待推敲哪个状态码更合适)
+            return response;
+        }
+    }
 }
 
