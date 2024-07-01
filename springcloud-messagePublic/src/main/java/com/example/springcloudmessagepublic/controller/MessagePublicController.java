@@ -171,7 +171,9 @@ public class MessagePublicController {
             ObjectMapper objectMapper = new ObjectMapper();
             Province province = objectMapper.convertValue(data, Province.class);
             String provinceName = province.getProvinceName();
+            System.out.println("provinceName----------------"+provinceName);
             String cityName = citiesFeignService.selectCityName(messagePublic.getCityId());
+            System.out.println("cityName++++++++++++++++"+cityName);
             String address = messagePublic.getAddress();
             Date date = messagePublic.getDate();
             String publicId = messagePublic.getPublicId();

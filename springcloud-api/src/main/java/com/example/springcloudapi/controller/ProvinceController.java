@@ -58,4 +58,13 @@ public class ProvinceController {
         }
         return list;
     }
+    @GetMapping("/selectAllProvinceId")
+    public List<String> selectProvinceId() {
+        List<Province> provinces = provinceMapper.selectList(null);
+        ArrayList<String> list = new ArrayList<>();
+        for(Province province:provinces) {
+            list.add(province.getProvinceId());
+        }
+        return list;
+    }
 }

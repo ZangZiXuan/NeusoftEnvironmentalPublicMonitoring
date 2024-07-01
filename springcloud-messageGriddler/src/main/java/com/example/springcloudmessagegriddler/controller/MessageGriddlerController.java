@@ -30,6 +30,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -411,10 +412,35 @@ public class MessageGriddlerController {
         LocalDateTime oneWeekAgo = now.minusWeeks(1);
         List<String> citiesByProvinceId = citiesFeignService.getCitiesByProvinceId(province);
         QueryWrapper<MessageGriddler> queryWrapper = new QueryWrapper<>();
-        queryWrapper.between("time", oneWeekAgo, now);
-        queryWrapper.in("city_id", citiesByProvinceId);
         List<MessageGriddler> messageGriddlerList = messageGriddlerMapper.selectList(
-                queryWrapper.orderByDesc("aqi_level"));
+                queryWrapper.between("time", oneWeekAgo, now));
+
+        List<String> messagePublicIds = messageGriddlerList.stream()
+                .map(MessageGriddler::getMessagePublicId)
+                .collect(Collectors.toList());
+        List<MessagePublic> messagePublicList = new ArrayList<>();
+        for(String messagePublicId:messagePublicIds){
+            Object data = messagePublicFeignService.selectMessagePublic(messagePublicId).get("data");
+            ObjectMapper objectMapper = new ObjectMapper();
+            MessagePublic messagePublic = objectMapper.convertValue(data, MessagePublic.class);
+            messagePublicList.add(messagePublic);
+//            messagePublic.getCityId()
+        }
+
+    // 创建一个映射表，以便快速查找 message_public_id 对应的 city_id
+    Map<String, String> messagePublicIdToCityIdMap = messagePublicList.stream()
+            .collect(Collectors.toMap(MessagePublic::getId, MessagePublic::getCityId));
+
+    // 过滤 messageGriddlerList，保留 city_id 在 citiesByProvinceId 列表中的记录
+
+List<MessageGriddler> filteredMessageGriddlerList = messageGriddlerList.stream()
+        .filter(griddler -> messagePublicIdToCityIdMap.containsKey(griddler.getMessagePublicId()) &&
+                citiesByProvinceId.contains(messagePublicIdToCityIdMap.get(griddler.getMessagePublicId())))
+        .collect(Collectors.toList());
+
+// 按 aqi_level 排序
+filteredMessageGriddlerList.sort(Comparator.comparing(MessageGriddler::getAqiLevel).reversed());
+
 //        messageGriddlerMapper.selectList(Wrappers.<MessageGriddler>lambdaQuery().eq()
         Map<String, Integer> maxAqiByCity = new HashMap<>();
         for(MessageGriddler messageGriddler: messageGriddlerList) {
@@ -479,13 +505,40 @@ public class MessageGriddlerController {
      * 找到空气质量最好的10个城市
      *
      */
-//    @GetMapping("/selectTopCity")
-//    public HttpResponseEntity selectTopCity(@RequestParam("limitNum") Integer limitNum) {
-//        if(limitNum == null || limitNum < 1)
-//            return HttpResponseEntity.error("limitNum is not valid");
-//        QueryWrapper<MessageGriddler> queryWrapper = new QueryWrapper<>();
-//
-//    }
+    @GetMapping("/selectTopCity")
+    public HttpResponseEntity selectTopCity(@RequestParam("limitNum") Integer limitNum) {
+        if(limitNum == null || limitNum < 1){
+            return HttpResponseEntity.error("limitNum is not valid");
+        }
+        // 获取当前时间的前一周时间
+        LocalDateTime oneWeekAgo = LocalDateTime.now().minus(1, ChronoUnit.WEEKS);
+        List<MessageGriddler> messageGriddlerList = messageGriddlerMapper.selectList(Wrappers.<MessageGriddler>lambdaQuery()
+                .eq(MessageGriddler::getStatus, 1)
+                .ge(MessageGriddler::getMessagePublicId, oneWeekAgo)
+                .orderByAsc(MessageGriddler::getCo)
+                .orderByAsc(MessageGriddler::getPm)
+                .orderByAsc(MessageGriddler::getSo2)
+                .last("LIMIT " + limitNum));
+        ArrayList<PlaceDTO> resultList = new ArrayList<>();
+        for(MessageGriddler messageGriddler:messageGriddlerList) {
+            Object data = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("data");
+            ObjectMapper objectMapper = new ObjectMapper();
+            MessagePublic messagePublic = objectMapper.convertValue(data, MessagePublic.class);
+
+            Object data1 = citiesFeignService.selectProvince(messagePublic.getProvinceId()).get("data");
+            ObjectMapper objectMapper1 = new ObjectMapper();
+            Province province = objectMapper1.convertValue(data1, Province.class);
+            province.getProvinceName();
+            PlaceDTO placeDTO = new PlaceDTO(province.getShortTitle(), province.getProvinceName(), citiesFeignService.selectCityName(messagePublic.getCityId()));
+            resultList.add(placeDTO);
+        }
+
+        if (resultList.isEmpty()) {
+            return HttpResponseEntity.error("获取空气质量最好的10个城市失败");
+        } else {
+            return HttpResponseEntity.success("query ", resultList);
+        }
+    }
 
 //        List<Report> reportList = reportService.list(queryWrapper.orderByDesc("created_time"));
 //        List<ResponseReportEntity> result = new ArrayList<>();
@@ -495,5 +548,60 @@ public class MessageGriddlerController {
 //        }
 //        return HttpResponseEntity.success("query ", result);
 //    }
-}
+/**
+ * 数据大屏显示AQI,SO2,CO,PM2.5超标统计
+ * 按各个省份进行筛选
+ * @return 每个省份的超标统计情况
+ */
+
+    @GetMapping("/getProvinceCount")
+    public HttpResponseEntity getProvinceCount_digitalScreen() {
+        int level = 3;
+        List<String> provinces = citiesFeignService.selectProvinceId();
+
+        Integer[] pm25Count = new Integer[provinces.size()];
+        Integer[] so2Count = new Integer[provinces.size()];
+        Integer[] coCount = new Integer[provinces.size()];
+        Integer[] AQICount = new Integer[provinces.size()];
+        for(int i = 0;i < provinces.size();i++) {
+            List<String> citiesIdByProvinceId = citiesFeignService.getCitiesIdByProvinceId(provinces.get(i));
+            QueryWrapper<MessageGriddler> QueryWrapper = new QueryWrapper<>();
+            QueryWrapper.ge("aqi_level",level);
+            List<MessageGriddler> messageGriddlerList = messageGriddlerMapper.selectList(QueryWrapper);
+            List<String> messagePublicIds = messageGriddlerList.stream()
+                    .map(MessageGriddler::getMessagePublicId)
+                    .collect(Collectors.toList());
+            ArrayList<MessagePublic> messagePublicList = new ArrayList<>();
+            for(String messagePublicId:messagePublicIds) {
+                Object data = messagePublicFeignService.selectMessagePublic(messagePublicId).get("data");
+                ObjectMapper objectMapper = new ObjectMapper();
+                MessagePublic messagePublic = objectMapper.convertValue(data, MessagePublic.class);
+                messagePublicList.add(messagePublic);
+            }
+            Map<String,String> messagePublicIdToCityIdMap = messagePublicList.stream()
+                    .collect(Collectors.toMap(MessagePublic::getId,MessagePublic::getCityId));
+//            保留city_id在citiesIdByProvinceId列表中的记录
+            List<MessageGriddler> messageGriddlerList1 = messageGriddlerList.stream()
+                    .filter(griddler -> messagePublicIdToCityIdMap.containsKey(griddler.getMessagePublicId()) &&
+                            citiesIdByProvinceId.contains(messagePublicIdToCityIdMap.get(griddler.getMessagePublicId())))
+                    .collect(Collectors.toList());
+
+            AQICount[i] = messageGriddlerList1.size();
+            so2Count[i]= Integer.parseInt(messageGriddlerMapper.selectCount(Wrappers.<MessageGriddler>lambdaQuery()
+                    .ge(MessageGriddler::getSo2, 186)).toString());
+            coCount[i]= Integer.parseInt(messageGriddlerMapper.selectCount(Wrappers.<MessageGriddler>lambdaQuery()
+                    .ge(MessageGriddler::getCo, 36)).toString());
+            pm25Count[i]= Integer.parseInt(messageGriddlerMapper.selectCount(Wrappers.<MessageGriddler>lambdaQuery()
+                    .ge(MessageGriddler::getPm, 116)).toString());
+        }
+        Map<String,  Object[]> result = new HashMap<>();
+        result.put("category", citiesFeignService.selectProvince().toArray());
+        result.put("pm25", pm25Count);
+        result.put("so2", so2Count);
+        result.put("co", coCount);
+        result.put("aqi", AQICount);
+        return HttpResponseEntity.success("get province count", result);
+    }
+    }
+
 

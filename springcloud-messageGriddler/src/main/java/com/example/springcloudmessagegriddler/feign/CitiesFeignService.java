@@ -34,4 +34,8 @@ public interface CitiesFeignService {
     public List<String> selectProvince();
     @GetMapping("/city/selectCitiesByProvince")
     public List<String> getCitiesByProvinceId(@RequestParam("provinceId") String provinceId);
+    @GetMapping("/province/selectAllProvinceId")
+    public List<String> selectProvinceId();
+    @GetMapping("/city/selectCitiesIdByProvince")
+    public List<String> getCitiesIdByProvinceId(@RequestParam("provinceId") String provinceId);
 }

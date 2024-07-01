@@ -80,7 +80,7 @@ public class CitiesController {
     }
     @GetMapping("/selectCityName")
     public String selectCityName(@RequestParam("cityId") String cityId) {
-        City city = cityMapper.selectOne(Wrappers.<City>lambdaQuery().eq(City::getId, cityId));
+        City city = cityMapper.selectOne(Wrappers.<City>lambdaQuery().eq(City::getCityId, cityId));
         return city.getCityName();
     }
 //    @GetMapping("/selectCitiesByProvince")
@@ -93,5 +93,13 @@ public class CitiesController {
         queryWrapper.eq("province_id", provinceId);
         List<City> cities = cityMapper.selectList(queryWrapper);
         return cities.stream().map(City::getCityName).collect(Collectors.toList());
+    }
+
+    @GetMapping("/selectCitiesIdByProvince")
+    public List<String> getCitiesIdByProvinceId(@RequestParam("provinceId") String provinceId) {
+        QueryWrapper<City> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("province_id", provinceId);
+        List<City> cities = cityMapper.selectList(queryWrapper);
+        return cities.stream().map(City::getCityId).collect(Collectors.toList());
     }
 }
