@@ -82,11 +82,17 @@ public class MessagePublicController {
         if(!messagePublicList.isEmpty()){
             for (MessagePublic messagePublic :
                     messagePublicList) {
-                City city = (City)citiesFeignService.selectCity(messagePublic.getCityId());
-                Province province = (Province) citiesFeignService.selectProvince(city.getProvinceId());
+                Object data = citiesFeignService.selectCity(messagePublic.getCityId()).get("data");
+                System.out.println(data);
+                ObjectMapper objectMapper = new ObjectMapper();
+                PlaceDTO placeDTO = objectMapper.convertValue(data, PlaceDTO.class);
+                System.out.println(placeDTO);
 
+                Object data1 = citiesFeignService.selectProvince(placeDTO.getProvinceId()).get("data");
+                ObjectMapper objectMapper1 = new ObjectMapper();
+                Province province = objectMapper1.convertValue(data1, Province.class);
                 MessagePublicDTO messagePublicDTO = new MessagePublicDTO(
-                  null,messagePublic,province.getProvinceName(),city.getCityName(), province.getShortTitle());
+                  null,messagePublic,province.getProvinceName(),citiesFeignService.selectCityName(placeDTO.getCityId()), placeDTO.getShortTitle());
                 messagePublicDTOList.add(messagePublicDTO);
             }
             response.put("success", true);
@@ -107,7 +113,7 @@ public class MessagePublicController {
      */
     @PostMapping("/viewAllMessagePublic")
     public Map<String,Object> viewAllMessagePublic(){
-        HashMap<String, Object> response = new HashMap<>();
+        Map<String, Object> response = new HashMap<>();
 //        List<ViewAllMessagePublicDataFrame> finalResult = new ArrayList<>();
         List<MessagePublic> messagePublicList = messagePublicMapper.selectList(null);
         List<MessagePublicDTO> messagePublicDTOList = new ArrayList<>();

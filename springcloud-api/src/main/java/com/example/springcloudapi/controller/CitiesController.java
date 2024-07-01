@@ -83,4 +83,8 @@ public class CitiesController {
         City city = cityMapper.selectOne(Wrappers.<City>lambdaQuery().eq(City::getId, cityId));
         return city.getCityName();
     }
+//    @GetMapping("/selectCitiesByProvince")
+//    public List<String> selectCitiesByProvince(@RequestParam("provinceId") String provinceId) {
+//
+////    }
 }

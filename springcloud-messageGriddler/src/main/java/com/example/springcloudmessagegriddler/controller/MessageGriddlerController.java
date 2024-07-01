@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.http.HttpResponse;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -369,31 +370,34 @@ public class MessageGriddlerController {
     /**
      * 中国地图！！！！！
      */
-//    @GetMapping("/AQIRegionalDistributionChina")
-//    public HttpResponseEntity AQIRegionalDistributionChina(@RequestParam("province") String provinceId) {
-//
-//    }
+    @GetMapping("/AQIRegionalDistribution")
+    private Map<String,Integer> AQIRegionalDistribution() {
 
-///**
- //     * get the record of the latest limitNum records within the latest week
- //     * @Request_character function getWeeklyAirData
- //     * @return the record of the latest limitNum records within the latest week
- //     */
-//    private Map<String, Integer> getWeeklyAirData_China(){
-//        LocalDateTime now = LocalDateTime.now();
-//        LocalDateTime oneWeekAgo = now.minusWeeks(1);
-//
-//        QueryWrapper<AirData> queryWrapper = new QueryWrapper<>();
-//        queryWrapper.between("date", oneWeekAgo, now);
-//        List<AirData> airDataList = airDataService.list(queryWrapper.orderByDesc("aqi"));
-//
-//        Map<String, Integer> maxAqiByProvince = new HashMap<>();
-//        for(AirData airData : airDataList){
-//            String province = cityService.getCityById(airData.getCityId()).getProvince();
-//            if(maxAqiByProvince.containsKey(province)) {
-//                if (airData.getAqi() > maxAqiByProvince.get(province))
-//                    maxAqiByProvince.put(province, airData.getAqi());
-//            }
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime oneWeekAgo = now.minusWeeks(1);
+        QueryWrapper<MessageGriddler> queryWrapper = new QueryWrapper<>();
+        queryWrapper.between("time",oneWeekAgo,now);
+        List<MessageGriddler> messageGriddlerList = messageGriddlerMapper.selectList(queryWrapper.orderByDesc("aqi_level"));
+        HashMap<String, Integer> maxAqiByProvince = new HashMap<>();
+        for(MessageGriddler messageGriddler:messageGriddlerList){
+            Object data = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("data");
+            ObjectMapper objectMapper = new ObjectMapper();
+            MessagePublic messagePublic = objectMapper.convertValue(data, MessagePublic.class);
+            Object data1 = citiesFeignService.selectProvince(messagePublic.getProvinceId()).get("data");
+            ObjectMapper objectMapper1 = new ObjectMapper();
+            Province province1 = objectMapper1.convertValue(data1, Province.class);
+            String province = province1.getProvinceName();
+            if(maxAqiByProvince.containsKey(province)) {
+                if(messageGriddler.getAqiLevel() > maxAqiByProvince.get(province)) {
+                    maxAqiByProvince.put(province,messageGriddler.getAqiLevel());
+                }
+            } else {
+                maxAqiByProvince.put(province,messageGriddler.getAqiLevel());
+            }
+        }
+        return maxAqiByProvince;
+    }
+
 //            else
 //                maxAqiByProvince.put(province, airData.getAqi());
 //        }
@@ -402,28 +406,50 @@ public class MessageGriddlerController {
     /**
      * 各省地图
      */
+
 //        /**
 //     * get the record of the latest limitNum records within the latest week
 //     * @Request_character digitalScreen
 //     * @param encodedProvince the province name using Base64 encoder to be queried(use request parameter to transmit)
 //     * @return the record of the latest limitNum records within the latest week
 //     */
-//    @GetMapping("/digitalScreen/WeeklyAirData")
-//    public HttpResponseEntity getWeeklyAirData(@RequestParam("province") String encodedProvince) {
-//        String province = "";
-//        if(encodedProvince != null)
-//            province = Base64Util.decodeBase64ToString(encodedProvince);
-//        Map<String, Integer> data = null;
-//        if(province.equals("china"))
-//            data = getWeeklyAirData_China();
+
+   @GetMapping("/AQIRegionalDistributionChina")
+    public HttpResponseEntity AQIRegionalDistributionChina(@RequestParam("province") String encodedProvince) {
+        String province = encodedProvince;
+        Map<String, Integer> data = null;
+        if(province.equals("china"))
+            data = AQIRegionalDistribution();
 //        else
 //            data = getWeeklyAirData_Province(province);
-//        List<Map<String, Object>> result = new ArrayList<>();
-//        for(String key : data.keySet())
-//            result.add(Map.of("name", key, "value", data.get(key)));
-//        return HttpResponseEntity.success("get weekly air data", result);
+        List<Map<String, Object>> result = new ArrayList<>();
+        for(String key : data.keySet())
+            result.add(Map.of("name", key, "value", data.get(key)));
+        return HttpResponseEntity.success("get weekly air data", result);
+    }
+
+//    private Map<String, Integer> getWeeklyAirData_Province(String province) {
+//        LocalDateTime now = LocalDateTime.now();
+//        LocalDateTime oneWeekAgo = now.minusWeeks(1);
+//
+//        List<Integer> citiesId = cityService.getCitiesIdByProvince(province);
+//
+//        QueryWrapper<MessageGriddler> queryWrapper = new QueryWrapper<>();
+//        queryWrapper.between("time", oneWeekAgo, now);
+//        queryWrapper.in("city_id", citiesId);
+//        List<AirData> airDataList = airDataService.list(queryWrapper.orderByDesc("aqi_level"));
+//
+//        Map<String, Integer> maxAqiByCity = new HashMap<>();
+//        for(AirData airData : airDataList){
+//            String city = cityService.getCityById(airData.getCityId()).getName();
+//            if(maxAqiByCity.containsKey(city)){
+//                if(airData.getAqi() > maxAqiByCity.get(city))
+//                    maxAqiByCity.put(city, airData.getAqi());
+//            }
+//            else
+//                maxAqiByCity.put(city, airData.getAqi());
+//        }
+//        return maxAqiByCity;
 //    }
-//
-//
 }
 
