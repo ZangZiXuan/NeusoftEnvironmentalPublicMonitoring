@@ -1,5 +1,6 @@
 package com.example.springcloudmessagepublic.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.springcloudapi.dao.dto.PlaceDTO;
@@ -190,60 +191,63 @@ public class MessagePublicController {
 //        }
 //        return HttpResponseEntity.success("query ", result);
 //    }
-    /**
-     * 通过特定的筛选条件，找到符合要求的信息
-     * @param provinceId
-     * @param cityId
-     * @param level
-     * @param date
-     * @param status
-     * @return ResponseEntity
-     */
     @RequestMapping("/viewSomeMessagePublic")
-    public Map<String,Object> viewSomeMessagePublic(@RequestParam("provinceId") String provinceId,
-                                                                    @RequestParam("cityId") String cityId,
-                                                                    @RequestParam("level") String level,
-                                                                    @RequestParam("Date") Date date,
-                                                                    @RequestParam("status") Integer status) {
+    public Map<String, Object> viewSomeMessagePublic(@RequestParam(value = "provinceId", required = false) String provinceId,
+                                                     @RequestParam(value = "cityId", required = false) String cityId,
+                                                     @RequestParam(value = "level", required = false) String level,
+                                                     @RequestParam(value = "date", required = false) Date date,
+                                                     @RequestParam(value = "status", required = false) Integer status) {
         HashMap<String, Object> response = new HashMap<>();
         List<MessagePublicDTO> messagePublicDTOList = new ArrayList<>();
 
-        List<MessagePublic> messagePublicList = messagePublicMapper.selectList(Wrappers.<MessagePublic>lambdaQuery()
-                .eq(MessagePublic::getCityId, cityId)
-                .eq(MessagePublic::getProvinceId, provinceId)
-                .eq(MessagePublic::getLevel, level)
-                .eq(MessagePublic::getDate, date)
-                .eq(MessagePublic::getStatus, status)
-        );
+        LambdaQueryWrapper<MessagePublic> queryWrapper = Wrappers.lambdaQuery();
+        if (provinceId != null) {
+            queryWrapper.eq(MessagePublic::getProvinceId, provinceId);
+        }
+        if (cityId != null) {
+            queryWrapper.eq(MessagePublic::getCityId, cityId);
+        }
+        if (level != null) {
+            queryWrapper.eq(MessagePublic::getLevel, level);
+        }
+        if (date != null) {
+            queryWrapper.eq(MessagePublic::getDate, date);
+        }
+        if (status != null) {
+            queryWrapper.eq(MessagePublic::getStatus, status);
+        }
 
-        if(!messagePublicList.isEmpty()) {
-            for (MessagePublic messagePublic :
-                    messagePublicList) {
-                City city = (City)citiesFeignService.selectCity(messagePublic.getCityId());
-                Province province = (Province) citiesFeignService.selectProvince(city.getProvinceId());
+        List<MessagePublic> messagePublicList = messagePublicMapper.selectList(queryWrapper);
 
+        if (!messagePublicList.isEmpty()) {
+            for (MessagePublic messagePublic : messagePublicList) {
+                // 查询城市和省份信息
+                String city =  citiesFeignService.selectCityName(messagePublic.getCityId());
+                Object data = citiesFeignService.selectProvince(messagePublic.getProvinceId()).get("data");
+                ObjectMapper objectMapper = new ObjectMapper();
+                Province province = objectMapper.convertValue(data, Province.class);
+
+                // 查询公众监督员的具体信息
                 String publicId = messagePublic.getPublicId();
-                /**
-                 * 从查询public的具体信息
-                 */
                 Public publicDetail = publicFeignService.getPublicById(publicId);
 
+                // 构建DTO对象
                 MessagePublicDTO messagePublicDTO = new MessagePublicDTO(
-                    publicDetail,messagePublic, province.getProvinceName(), city.getCityName(), province.getShortTitle());
+                        publicDetail, messagePublic, province.getProvinceName(), city,
+                        province.getShortTitle());
                 messagePublicDTOList.add(messagePublicDTO);
             }
             response.put("success", true);
             response.put("message", "用特定条件查询特定的公众监督员的提交记录成功");
-            response.put("data",messagePublicDTOList);
-            return response;
-        }else {
+            response.put("data", messagePublicDTOList);
+        } else {
             response.put("success", false);
             response.put("message", "没有符合筛选条件的公众监督员的提交记录");
-            response.put("data",null);
-            //返回 400 Bad Request 表示请求不合法.(待推敲哪个状态码更合适)
-            return response;
+            response.put("data", null);
         }
+        return response;
     }
+
 
     /**
      *
