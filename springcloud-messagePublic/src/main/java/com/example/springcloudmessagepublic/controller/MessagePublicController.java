@@ -272,11 +272,10 @@ public class MessagePublicController {
         System.out.println(date);
         if (date != null) {
             // Convert the ISO 8601 date to the desired format
-            SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
-            SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy-MM-dd");
             String dateString = dbFormat.format(date);
-            Date formattedDate = dbFormat.parse(dateString);
-            queryWrapper.eq(MessagePublic::getDate, formattedDate);
+            System.out.println(dateString);
+            queryWrapper.likeRight(MessagePublic::getDate, dateString);
         }
         if (status != null) {
             queryWrapper.eq(MessagePublic::getStatus, status);
