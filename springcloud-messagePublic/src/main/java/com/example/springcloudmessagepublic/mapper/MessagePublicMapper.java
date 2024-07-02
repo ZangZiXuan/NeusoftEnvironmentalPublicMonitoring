@@ -3,6 +3,7 @@ package com.example.springcloudmessagepublic.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.example.springcloudapi.dao.entity.MessagePublic;
 import org.apache.ibatis.annotations.Mapper;
+import org.springframework.stereotype.Repository;
 
 /**
  * @Author Zang Xinrui

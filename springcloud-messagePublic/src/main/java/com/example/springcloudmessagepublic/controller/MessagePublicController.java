@@ -3,6 +3,7 @@ package com.example.springcloudmessagepublic.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.springcloudapi.dao.dto.PlaceDTO;
 import com.example.springcloudapi.dao.entity.MessagePublic;
 import com.example.springcloudapi.dao.dto.MessagePublicDTO;
@@ -14,11 +15,13 @@ import com.example.springcloudapi.mapper.ProvinceMapper;
 import com.example.springcloudapi.utils.HttpResponseEntity;
 import com.example.springcloudapi.utils.UUIDUtil;
 import com.example.springcloudmessagepublic.dto.DigitalMessagePublicDTO;
+import com.example.springcloudmessagepublic.dto.MessagePublicPageDTO;
 import com.example.springcloudmessagepublic.dto.ViewAllMessagePublicDataFrame;
 import com.example.springcloudmessagepublic.feign.CitiesFeignService;
 
 import com.example.springcloudmessagepublic.feign.PublicFeignService;
 import com.example.springcloudmessagepublic.mapper.MessagePublicMapper;
+import com.example.springcloudmessagepublic.util.PaginationUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -187,19 +190,12 @@ public class MessagePublicController {
         return HttpResponseEntity.success("query ", result);
     }
 
-//        List<ResponseReportEntity> result = new ArrayList<>();
-//        for(int i = 0; i < limitNum && i < reportList.size(); i++){
-//            City city = cityService.getCityById(reportList.get(i).getCityId());
-//            result.add(new ResponseReportEntity(reportList.get(i), city));
-//        }
-//        return HttpResponseEntity.success("query ", result);
-//    }
-//    @RequestMapping("/viewSomeMessagePublic")
+//    @GetMapping("/viewSomeMessagePublic")
 //    public Map<String, Object> viewSomeMessagePublic(@RequestParam(value = "provinceId", required = false) String provinceId,
 //                                                     @RequestParam(value = "cityId", required = false) String cityId,
 //                                                     @RequestParam(value = "level", required = false) String level,
-//                                                     @RequestParam(value = "date", required = false) Date date,
-//                                                     @RequestParam(value = "status", required = false) Integer status) {
+//                                                     @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date date,
+//                                                     @RequestParam(value = "status", required = false) Integer status) throws ParseException, ParseException {
 //        HashMap<String, Object> response = new HashMap<>();
 //        List<MessagePublicDTO> messagePublicDTOList = new ArrayList<>();
 //
@@ -213,8 +209,13 @@ public class MessagePublicController {
 //        if (level != null) {
 //            queryWrapper.eq(MessagePublic::getLevel, level);
 //        }
+//        System.out.println(date);
 //        if (date != null) {
-//            queryWrapper.eq(MessagePublic::getDate, date);
+//            // Convert the ISO 8601 date to the desired format
+//            SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy-MM-dd");
+//            String dateString = dbFormat.format(date);
+//            System.out.println(dateString);
+//            queryWrapper.likeRight(MessagePublic::getDate, dateString);
 //        }
 //        if (status != null) {
 //            queryWrapper.eq(MessagePublic::getStatus, status);
@@ -225,7 +226,7 @@ public class MessagePublicController {
 //        if (!messagePublicList.isEmpty()) {
 //            for (MessagePublic messagePublic : messagePublicList) {
 //                // 查询城市和省份信息
-//                String city =  citiesFeignService.selectCityName(messagePublic.getCityId());
+//                String city = citiesFeignService.selectCityName(messagePublic.getCityId());
 //                Object data = citiesFeignService.selectProvince(messagePublic.getProvinceId()).get("data");
 //                ObjectMapper objectMapper = new ObjectMapper();
 //                Province province = objectMapper.convertValue(data, Province.class);
@@ -250,16 +251,27 @@ public class MessagePublicController {
 //        }
 //        return response;
 //    }
+@Autowired
+private PaginationUtil paginationUtil;
+
+    @GetMapping("/messagePublicPage/{current}/{size}")
+    public Map<String, Object> messagePublicPage(@PathVariable("current") Integer current, @PathVariable("size") Integer size) {
+        QueryWrapper<MessagePublic> queryWrapper = new QueryWrapper<>();
+        return paginationUtil.getPaginatedMessagePublics(current, size, queryWrapper);
+    }
+
     @GetMapping("/viewSomeMessagePublic")
-    public Map<String, Object> viewSomeMessagePublic(@RequestParam(value = "provinceId", required = false) String provinceId,
-                                                     @RequestParam(value = "cityId", required = false) String cityId,
-                                                     @RequestParam(value = "level", required = false) String level,
-                                                     @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date date,
-                                                     @RequestParam(value = "status", required = false) Integer status) throws ParseException, ParseException {
-        HashMap<String, Object> response = new HashMap<>();
-        List<MessagePublicDTO> messagePublicDTOList = new ArrayList<>();
+    public Map<String, Object> viewSomeMessagePublic(
+            @RequestParam(value = "provinceId", required = false) String provinceId,
+            @RequestParam(value = "cityId", required = false) String cityId,
+            @RequestParam(value = "level", required = false) String level,
+            @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date date,
+            @RequestParam(value = "status", required = false) Integer status,
+            @RequestParam(value = "current", required = true) Integer current,
+            @RequestParam(value = "size", required = true) Integer size) throws ParseException {
 
         LambdaQueryWrapper<MessagePublic> queryWrapper = Wrappers.lambdaQuery();
+
         if (provinceId != null) {
             queryWrapper.eq(MessagePublic::getProvinceId, provinceId);
         }
@@ -269,47 +281,16 @@ public class MessagePublicController {
         if (level != null) {
             queryWrapper.eq(MessagePublic::getLevel, level);
         }
-        System.out.println(date);
         if (date != null) {
-            // Convert the ISO 8601 date to the desired format
             SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy-MM-dd");
             String dateString = dbFormat.format(date);
-            System.out.println(dateString);
             queryWrapper.likeRight(MessagePublic::getDate, dateString);
         }
         if (status != null) {
             queryWrapper.eq(MessagePublic::getStatus, status);
         }
 
-        List<MessagePublic> messagePublicList = messagePublicMapper.selectList(queryWrapper);
-
-        if (!messagePublicList.isEmpty()) {
-            for (MessagePublic messagePublic : messagePublicList) {
-                // 查询城市和省份信息
-                String city = citiesFeignService.selectCityName(messagePublic.getCityId());
-                Object data = citiesFeignService.selectProvince(messagePublic.getProvinceId()).get("data");
-                ObjectMapper objectMapper = new ObjectMapper();
-                Province province = objectMapper.convertValue(data, Province.class);
-
-                // 查询公众监督员的具体信息
-                String publicId = messagePublic.getPublicId();
-                Public publicDetail = publicFeignService.getPublicById(publicId);
-
-                // 构建DTO对象
-                MessagePublicDTO messagePublicDTO = new MessagePublicDTO(
-                        publicDetail, messagePublic, province.getProvinceName(), city,
-                        province.getShortTitle());
-                messagePublicDTOList.add(messagePublicDTO);
-            }
-            response.put("success", true);
-            response.put("message", "用特定条件查询特定的公众监督员的提交记录成功");
-            response.put("data", messagePublicDTOList);
-        } else {
-            response.put("success", false);
-            response.put("message", "没有符合筛选条件的公众监督员的提交记录");
-            response.put("data", null);
-        }
-        return response;
+        return paginationUtil.getPaginatedMessagePublics(current, size, queryWrapper);
     }
 
     /**
@@ -339,6 +320,52 @@ public class MessagePublicController {
             return response;
         }
     }
+
+
+    /**
+     * 分页查询
+     *监督员提交信息列表
+     * @param current
+     * @param size
+     * @return
+     */
+
+//    @GetMapping("/messagePublicPage/{current}/{size}")
+//    public Map<String, Object> messagePublicPage(@PathVariable("current") Integer current, @PathVariable("size") Integer size) {
+//        Map<String, Object> response = new HashMap<>();
+//        ArrayList<MessagePublicDTO> messagePublicDTOs = new ArrayList<>();
+//        Page<MessagePublic> page = new Page<>(current, size);
+//        QueryWrapper<MessagePublic> wrapper = new QueryWrapper<>();
+//        messagePublicMapper.selectPage(page, wrapper);
+//        List<MessagePublic> messagePublics = page.getRecords();
+//
+//        for (MessagePublic messagePublic : messagePublics) {
+//            String publicId = messagePublic.getPublicId();
+//            Public publicDetail = publicFeignService.getPublicById(publicId);
+//            String city = citiesFeignService.selectCityName(messagePublic.getCityId()).toString();
+//            Object data1 = citiesFeignService.selectProvince(messagePublic.getProvinceId()).get("data");
+//            System.out.println(data1);
+//            ObjectMapper objectMapper1 = new ObjectMapper();
+//            Province province = objectMapper1.convertValue(data1, Province.class);
+//
+//            MessagePublicDTO messagePublicDTO = new MessagePublicDTO(
+//                    publicDetail, messagePublic, province.getProvinceName(),
+//                    city, province.getShortTitle()
+//            );
+//            messagePublicDTOs.add(messagePublicDTO);
+//        }
+//        if (!messagePublicDTOs.isEmpty()) {
+//            response.put("success", true);
+//            response.put("message", "查询所有的公众监督员的提交记录分页成功");
+//            response.put("data", messagePublicDTOs);
+//            return response;
+//        } else {
+//            response.put("success", false);
+//            response.put("message", "当前用户还未提交过反馈信息");
+//            response.put("data", null);
+//            return response;
+//        }
+//    }
 
 
     /**
