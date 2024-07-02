@@ -1,0 +1,31 @@
+spring.application.name:
+  neusoft-gateway
+server:
+  port: 9000
+spring:
+  application:
+    name: cloud-gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848 #nacos????
+    gateway:
+      routes:
+        - id: provider1 #??id,?????
+          uri: http://localhost:8001 #????????????
+          #uri: lb://provider-dept #????????????
+          predicates: #?????????????uri/Path???
+            - Path=/dept/**
+            #- After=2023-07-26T08:23:30.536+08:00[Asia/Shanghai]
+            #- Cookie=phone,139
+            #- Header=abc,\d+
+            #- Query=productId,\d+
+          filters:
+            - AddRequestParameter=color,blue
+            - AddRequestParameter=address,nj
+
+        - id: provider2
+          #uri: http://localhost:8001 #????????????
+          uri: lb://provider-dept
+          predicates:
+            - Path=/dept111/**

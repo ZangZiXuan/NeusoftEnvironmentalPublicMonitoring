@@ -17,6 +17,7 @@
         <module>springcloud-manager</module>
         <module>springcloud-policyMaker</module>
         <module>springcloud-griddler</module>
+        <module>neusoft-gateway</module>
 <!--        <module>springcloud-user</module>-->
     </modules>
 

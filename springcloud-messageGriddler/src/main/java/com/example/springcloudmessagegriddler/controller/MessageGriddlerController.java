@@ -60,10 +60,12 @@ public class MessageGriddlerController {
             @RequestParam("message_public_id") String messagePublicId
             ,@RequestParam("aqi_level") int aqiLevel,
             @RequestParam("griddler_id") String griddlerId){
+
         MessageGriddler messageGriddler = new MessageGriddler(
                 UUID.randomUUID().toString(),messagePublicId,griddlerId,so2,co,pm,
-                CommUtil.getNowDateLongStr("yyyy-mm-dd HH:mm:ss"),1,aqiLevel
+                CommUtil.getNowDateAsDate(),1,aqiLevel
         );
+
         int insert = messageGriddlerMapper.insert(messageGriddler);
         Map<String, Object> response = new HashMap<>();
         if(insert == 1){

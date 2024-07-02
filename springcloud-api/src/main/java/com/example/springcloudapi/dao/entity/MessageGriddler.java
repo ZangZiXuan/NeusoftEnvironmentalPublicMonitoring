@@ -1,9 +1,6 @@
 package com.example.springcloudapi.dao.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,6 +31,7 @@ public class MessageGriddler {
     private int so2;
     private int co;
     private int pm;
+    @TableField(fill = FieldFill.INSERT)
     private Date time;
     /**
      * 待确认：0，已确认1

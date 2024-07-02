@@ -15,6 +15,7 @@
         <module name="springcloud-public" />
         <module name="springcloud-messagePublic" />
         <module name="springcloud-messageManager" />
+        <module name="neusoft-gateway" />
         <module name="springcloud-policyMaker" />
       </profile>
     </annotationProcessing>
@@ -23,6 +24,7 @@
       <module name="NEPM" target="17" />
       <module name="NEPS" target="17" />
       <module name="NEPV" target="17" />
+      <module name="neusoft-gateway" target="17" />
       <module name="NeusoftEnvironmentalPublicMonitoring" target="17" />
       <module name="springcloud-api" target="17" />
       <module name="springcloud-griddler" target="17" />
@@ -44,6 +46,7 @@
       <module name="NEPM" options="-parameters" />
       <module name="NEPS" options="-parameters" />
       <module name="NEPV" options="-parameters" />
+      <module name="neusoft-gateway" options="-parameters" />
       <module name="springcloud-api" options="" />
       <module name="springcloud-griddler" options="" />
       <module name="springcloud-login" options="" />

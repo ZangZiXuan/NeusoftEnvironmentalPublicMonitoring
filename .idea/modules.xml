@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/NeusoftEnvironmentalPublicMonitoring.iml" filepath="$PROJECT_DIR$/.idea/NeusoftEnvironmentalPublicMonitoring.iml" />
+      <module fileurl="file://$PROJECT_DIR$/neusoft-gateway/neusoft-gateway.iml" filepath="$PROJECT_DIR$/neusoft-gateway/neusoft-gateway.iml" />
       <module fileurl="file://$PROJECT_DIR$/springcloud-api/springcloud-api.iml" filepath="$PROJECT_DIR$/springcloud-api/springcloud-api.iml" />
       <module fileurl="file://$PROJECT_DIR$/springcloud-griddler/springcloud-griddler.iml" filepath="$PROJECT_DIR$/springcloud-griddler/springcloud-griddler.iml" />
       <module fileurl="file://$PROJECT_DIR$/springcloud-login/springcloud-login.iml" filepath="$PROJECT_DIR$/springcloud-login/springcloud-login.iml" />
