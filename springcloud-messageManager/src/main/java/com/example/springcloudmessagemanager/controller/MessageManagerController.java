@@ -92,10 +92,8 @@ public class MessageManagerController {
         HashMap<String, Object> response = new HashMap<>();
         for(MessageManager messageManager:messageManagerList) {
 
-            Object response1 = messagePublicFeignService.selectMessagePublic(messageManager.getMessageId());
-            // 获取data部分
-            Map<String, Object> responseMap = (Map<String, Object>) response1;
-            Object data = responseMap.get("data");
+            Object data = messagePublicFeignService.selectMessagePublic(messageManager.getMessageId()).get("data");
+            System.out.println(data);
 
 
             // 检查data是否为空
@@ -108,7 +106,7 @@ public class MessageManagerController {
                 int level = messagePublic.getLevel();
                 String address = messagePublic.getAddress();
                 Date date = messagePublic.getDate();
-                ShowDetailDTO showDetailDTO = new ShowDetailDTO(provinceName, cityName, level, address, date);
+                ShowDetailDTO showDetailDTO = new ShowDetailDTO(provinceName, cityName, level, address, date,messagePublic.getId());
 
                 list.add(showDetailDTO);
             }

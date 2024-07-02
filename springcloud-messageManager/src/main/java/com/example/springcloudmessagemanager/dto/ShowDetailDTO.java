@@ -21,4 +21,5 @@ public class ShowDetailDTO {
     private int level;
     private String address;
     private Date date;
+    private String messageId;
 }
