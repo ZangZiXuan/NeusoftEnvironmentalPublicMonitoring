@@ -13,6 +13,7 @@ import com.example.springcloudapi.utils.CommUtil;
 import com.example.springcloudapi.utils.HttpResponseEntity;
 import com.example.springcloudmessagegriddler.dto.DigitalScreenMessageGriddler;
 import com.example.springcloudmessagegriddler.feign.CitiesFeignService;
+import com.example.springcloudmessagegriddler.feign.MessageManagerFeignService;
 import com.example.springcloudmessagegriddler.feign.MessagePublicFeignService;
 
 import com.example.springcloudmessagegriddler.feign.PublicFeignService;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.http.HttpResponse;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -54,32 +56,77 @@ public class MessageGriddlerController {
      * 网格员确认提交数据
      */
 
-    @PostMapping("/creatMessageGriddler")
-    public Map<String,Object> creatMessageGriddler(@RequestParam("co") int co,
-            @RequestParam("pm") int pm,@RequestParam("so2") int so2,
-            @RequestParam("message_public_id") String messagePublicId
-            ,@RequestParam("aqi_level") int aqiLevel,
-            @RequestParam("griddler_id") String griddlerId){
+//    @PostMapping("/creatMessageGriddler")
+//    public Map<String,Object> creatMessageGriddler(@RequestParam("co") int co,
+//            @RequestParam("pm") int pm,@RequestParam("so2") int so2,
+//            @RequestParam("message_public_id") String messagePublicId
+//            ,@RequestParam("aqi_level") int aqiLevel,
+//            @RequestParam("griddler_id") String griddlerId){
+//
+//        MessageGriddler messageGriddler = new MessageGriddler(
+//                UUID.randomUUID().toString(),messagePublicId,griddlerId,so2,co,pm,
+//                CommUtil.getNowDateAsDate(),1,aqiLevel
+//        );
+//
+//        int insert = messageGriddlerMapper.insert(messageGriddler);
+//        Map<String, Object> response = new HashMap<>();
+//        if(insert == 1){
+//            response.put("success", true);
+//            response.put("message", "网格员端的提交实测数据添加成功");
+//            response.put("data",insert);
+//            return response;
+//        }else {
+//            response.put("success", false);
+//            response.put("message", "网格员端的提交实测数据添加失败");
+//            response.put("data",null);
+//            return response;
+//        }
+//    }
+    @Autowired
+    MessageManagerFeignService messageManagerFeignService;
 
+    @PostMapping("/creatMessageGriddler")
+    public Map<String, Object> creatMessageGriddler(@RequestParam("co") int co,
+                                                    @RequestParam("pm") int pm,
+                                                    @RequestParam("so2") int so2,
+                                                    @RequestParam("message_public_id") String messagePublicId,
+                                                    @RequestParam("aqi_level") int aqiLevel,
+                                                    @RequestParam("griddler_id") String griddlerId) {
+        // 设置当前日期并转换为需要的格式
+        Date now = new Date();
+        SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String formattedDate = dbFormat.format(now);
+
+        // 创建 MessageGriddler 对象
         MessageGriddler messageGriddler = new MessageGriddler(
-                UUID.randomUUID().toString(),messagePublicId,griddlerId,so2,co,pm,
-                CommUtil.getNowDateAsDate(),1,aqiLevel
+                UUID.randomUUID().toString(),
+                messagePublicId,
+                griddlerId,
+                so2,
+                co,
+                pm,
+                now,  // 插入转换后的日期
+                1,
+                aqiLevel
         );
+        messageManagerFeignService.updateMessageStatus(messageGriddler.getMessagePublicId());
 
         int insert = messageGriddlerMapper.insert(messageGriddler);
         Map<String, Object> response = new HashMap<>();
-        if(insert == 1){
+        if (insert == 1) {
             response.put("success", true);
             response.put("message", "网格员端的提交实测数据添加成功");
-            response.put("data",insert);
-            return response;
-        }else {
+            response.put("data", insert);
+        } else {
             response.put("success", false);
             response.put("message", "网格员端的提交实测数据添加失败");
-            response.put("data",null);
-            return response;
+            response.put("data", null);
         }
+        return response;
     }
+
+
+
 
     /**
      * 查看网格员确认的所有信息

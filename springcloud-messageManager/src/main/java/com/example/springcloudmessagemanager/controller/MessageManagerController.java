@@ -124,4 +124,37 @@ public class MessageManagerController {
         }
     }
 
+    @GetMapping("/updateMessageStatus")
+    public Map<String, Object> updateMessageStatus(@RequestParam("messageId") String messageId) {
+        // 查询要更新的记录
+        MessageManager messageManager = messageManagerMapper.selectOne(
+                Wrappers.<MessageManager>lambdaQuery()
+                        .eq(MessageManager::getMessageId, messageId)
+        );
+
+        if (messageManager != null) {
+            // 更新status字段为1
+            messageManager.setStatus(1);
+
+            // 执行更新操作
+            int update = messageManagerMapper.updateById(messageManager);
+
+            // 构建响应
+            Map<String, Object> response = new HashMap<>();
+            if (update == 1) {
+                response.put("success", true);
+                response.put("message", "更新成功");
+            } else {
+                response.put("success", false);
+                response.put("message", "更新失败");
+            }
+            return response;
+        } else {
+            // 如果没有找到对应的记录
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "未找到对应的记录");
+            return response;
+        }
+    }
 }
