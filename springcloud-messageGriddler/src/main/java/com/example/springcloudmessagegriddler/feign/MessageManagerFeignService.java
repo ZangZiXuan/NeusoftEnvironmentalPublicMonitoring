@@ -14,6 +14,6 @@ import java.util.Map;
  */
 @FeignClient(name = "springcloud-messageManager",url = "localhost:8086")
 public interface MessageManagerFeignService {
-    @GetMapping("/updateMessageStatus")
+    @GetMapping("/messageManager/updateMessageStatus")
     public Map<String, Object> updateMessageStatus(@RequestParam("messageId") String messageId);
 }
