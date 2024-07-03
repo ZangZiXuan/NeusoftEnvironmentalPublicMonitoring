@@ -20,6 +20,7 @@ import com.example.springcloudmessagegriddler.feign.PublicFeignService;
 import com.example.springcloudmessagegriddler.mapper.MessageGriddlerMapper;
 
 import com.example.springcloudmessagegriddler.service.AQIService;
+import com.example.springcloudmessagepublic.dto.MessagePublicPageDTO;
 import com.example.springcloudmessagepublic.mapper.MessagePublicMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
@@ -179,10 +180,11 @@ public class MessageGriddlerController {
         for (MessageGriddler messageGriddler : messageGriddlers) {
 
             Object messagePublic1 = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("data");
+            System.out.println(messagePublic1);
             ObjectMapper objectMapper = new ObjectMapper();
-            MessagePublic messagePublic = objectMapper.convertValue(messagePublic1, MessagePublic.class);
+            MessagePublicPageDTO messagePublic = objectMapper.convertValue(messagePublic1, MessagePublicPageDTO.class);
 
-            Object province1 = citiesFeignService.selectProvince(messagePublic.getProvinceId()).get("data");
+            Object province1 = citiesFeignService.selectProvince(messagePublic.getMessagePublic().getProvinceId()).get("data");
             ObjectMapper objectMapper2 = new ObjectMapper();
             Province province = objectMapper2.convertValue(province1, Province.class);
 
