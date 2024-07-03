@@ -21,6 +21,7 @@ import com.example.springcloudmessagepublic.feign.CitiesFeignService;
 
 import com.example.springcloudmessagepublic.feign.PublicFeignService;
 import com.example.springcloudmessagepublic.mapper.MessagePublicMapper;
+import com.example.springcloudmessagepublic.service.impl.MessagePublicServiceImpl;
 import com.example.springcloudmessagepublic.util.PaginationUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -251,13 +252,14 @@ public class MessagePublicController {
 //        }
 //        return response;
 //    }
-@Autowired
-private PaginationUtil paginationUtil;
+
+    @Autowired
+    MessagePublicServiceImpl messagePublicService;
 
     @GetMapping("/messagePublicPage/{current}/{size}")
     public Map<String, Object> messagePublicPage(@PathVariable("current") Integer current, @PathVariable("size") Integer size) {
         QueryWrapper<MessagePublic> queryWrapper = new QueryWrapper<>();
-        return paginationUtil.getPaginatedMessagePublics(current, size, queryWrapper);
+        return messagePublicService.getPaginatedMessagePublics(current, size, queryWrapper);
     }
 
     @GetMapping("/viewSomeMessagePublic")
@@ -270,28 +272,29 @@ private PaginationUtil paginationUtil;
             @RequestParam(value = "current", required = true) Integer current,
             @RequestParam(value = "size", required = true) Integer size) throws ParseException {
 
-        LambdaQueryWrapper<MessagePublic> queryWrapper = Wrappers.lambdaQuery();
+        QueryWrapper<MessagePublic> queryWrapper = new QueryWrapper<>();
 
         if (provinceId != null) {
-            queryWrapper.eq(MessagePublic::getProvinceId, provinceId);
+            queryWrapper.eq("province_id", provinceId);
         }
         if (cityId != null) {
-            queryWrapper.eq(MessagePublic::getCityId, cityId);
+            queryWrapper.eq("city_id", cityId);
         }
         if (level != null) {
-            queryWrapper.eq(MessagePublic::getLevel, level);
+            queryWrapper.eq("level", level);
         }
         if (date != null) {
             SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy-MM-dd");
             String dateString = dbFormat.format(date);
-            queryWrapper.likeRight(MessagePublic::getDate, dateString);
+            queryWrapper.likeRight("date", dateString);
         }
         if (status != null) {
-            queryWrapper.eq(MessagePublic::getStatus, status);
+            queryWrapper.eq("status", status);
         }
 
-        return paginationUtil.getPaginatedMessagePublics(current, size, queryWrapper);
+        return messagePublicService.getPaginatedMessagePublics(current, size, queryWrapper);
     }
+
 
     /**
      *
