@@ -20,9 +20,4 @@ import java.util.Date;
 public class MessagePublicPageDTO {
     private Public aPublic;
     private MessagePublic messagePublic;
-    private String provinceName;
-    private String cityName;
-    private String shortTitle;
-    private int current;
-    private int size;
 }

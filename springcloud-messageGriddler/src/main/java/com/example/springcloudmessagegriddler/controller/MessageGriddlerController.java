@@ -174,7 +174,7 @@ public class MessageGriddlerController {
         // 用于存储返回的数据
         HashMap<String, Object> response = new HashMap<>();
         // 用于存储统计结果
-        Map<String, MessageGriddlerDTO> provinceStats = new HashMap<>();
+        List<MessageGriddlerDTO> provinceStats = new ArrayList<>();
 
         for (MessageGriddler messageGriddler : messageGriddlers) {
 
@@ -187,12 +187,22 @@ public class MessageGriddlerController {
             Province province = objectMapper2.convertValue(province1, Province.class);
 
             String provinceId = province.getId();
-            MessageGriddlerDTO stats = provinceStats.getOrDefault(provinceId, new MessageGriddlerDTO(
-                    provinceId,
-                    province.getProvinceName(),
-                    province.getShortTitle(),
-                    0, 0, 0, 0
-            ));
+            Optional<MessageGriddlerDTO> existingStats = provinceStats.stream()
+                    .filter(stats -> stats.getProvinceId().equals(provinceId))
+                    .findFirst();
+
+            MessageGriddlerDTO stats;
+            if (existingStats.isPresent()) {
+                stats = existingStats.get();
+            } else {
+                stats = new MessageGriddlerDTO(
+                        provinceId,
+                        province.getProvinceName(),
+                        province.getShortTitle(),
+                        0, 0, 0, 0
+                );
+                provinceStats.add(stats);
+            }
 
             int co = messageGriddler.getCo();
             int pm = messageGriddler.getPm();
@@ -201,31 +211,24 @@ public class MessageGriddlerController {
             if (co > 24) stats.setCoNum(stats.getCoNum() + 1);
             if (pm > 150) stats.setPmNum(stats.getPmNum() + 1);
             if (so2 > 800) stats.setSoNum(stats.getSoNum() + 1);
-            stats.setAQINum(Math.max(Math.max(stats.getCoNum(),stats.getPmNum()),stats.getSoNum()));
-
-            provinceStats.put(provinceId, stats);
+            stats.setAQINum(Math.max(Math.max(stats.getCoNum(), stats.getPmNum()), stats.getSoNum()));
         }
 
-        response.put("provinceStats", new ArrayList<>(provinceStats.values()));
+        response.put("provinceStats", provinceStats);
 
-//        result.put("pm25", pm25Count);
-//        result.put("so2", so2Count);
-//        result.put("co", coCount);
-//        result.put("aqi", AQICount);
-
-        if(provinceStats.isEmpty()) {
+        if (provinceStats.isEmpty()) {
             response.put("success", false);
             response.put("message", "查看省分组分项检查统计数据失败");
-            response.put("data",null);
-            return response;
+            response.put("data", null);
         } else {
-            response.put("provinceStats", new ArrayList<>(provinceStats.values()));
-            response.put("data",provinceStats);
             response.put("success", true);
             response.put("message", "查看省分组分项检查统计数据成功");
-            return response;
+            response.put("data", provinceStats);
         }
+
+        return response;
     }
+
     /**
      * 管理员端
      * 统计信息管理

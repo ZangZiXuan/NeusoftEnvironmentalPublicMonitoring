@@ -306,6 +306,8 @@ private PaginationUtil paginationUtil;
                 Wrappers.<MessagePublic>lambdaQuery().eq(MessagePublic::getId, messageId));
         System.out.println();
         MessagePublic messagePublic = messagePublics.get(0);
+        Public aPublic = publicFeignService.getPublicById(messagePublic.getPublicId());
+        MessagePublicPageDTO messagePublicPageDTO = new MessagePublicPageDTO(aPublic,messagePublic);
         if(messagePublics.isEmpty()) {
             response.put("success", false);
             response.put("message", "当前用户还未提交过反馈信息");
@@ -316,7 +318,7 @@ private PaginationUtil paginationUtil;
         }else {
             response.put("success", true);
             response.put("message", "某个id的公众监督员记录");
-            response.put("data",messagePublic);
+            response.put("data",messagePublicPageDTO);
             return response;
         }
     }
