@@ -2,10 +2,14 @@ package com.example.springcloudmessagemanager.controller;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.springcloudapi.dao.dto.MessagePublicDTO;
+import com.example.springcloudapi.dao.entity.Griddler;
+import com.example.springcloudapi.dao.entity.MessageGriddler;
 import com.example.springcloudapi.dao.entity.MessageManager;
 import com.example.springcloudapi.dao.entity.MessagePublic;
 import com.example.springcloudmessagemanager.dto.ShowDetailDTO;
+import com.example.springcloudmessagemanager.dto.ViewPageDTO;
 import com.example.springcloudmessagemanager.feign.CitiesFeignService;
+import com.example.springcloudmessagemanager.feign.GriddlerFeignService;
 import com.example.springcloudmessagemanager.feign.MessageGriddlerFeignService;
 import com.example.springcloudmessagemanager.feign.MessagePublicFeignService;
 import com.example.springcloudmessagemanager.mapper.MessageManagerMapper;
@@ -157,5 +161,41 @@ public class MessageManagerController {
             response.put("message", "未找到对应的记录");
             return response;
         }
+    }
+    @Autowired
+    GriddlerFeignService griddlerFeignService;
+    @GetMapping("/viewPageMessageManager")
+    public Map<String,Object> viewPageMessageManager(@RequestParam("messageId") String messageId) {
+
+        Map<String, Object> response = new HashMap<>();
+        //查看
+        MessageManager messageManager = messageManagerMapper.selectOne(
+                Wrappers.<MessageManager>lambdaQuery()
+                        .eq(MessageManager::getMessageId, messageId)
+
+        );
+        String s = "";
+        if(messageManager!=null && messageManager.getStatus()==0) {
+            s += "已指派，等待网格员确认";
+
+            Griddler griddler = griddlerFeignService.selectPlaceGriddler(messageManager.getGriddlerId());
+            response.put("data",new ViewPageDTO(messageManager,griddler.getName(),s));
+            response.put("message","当前信息已指派，等待网格员确认");
+
+        } else if(messageManager!=null && messageManager.getStatus()==1){
+            s += "已确认";
+            MessageGriddler messageGriddler = messageGriddlerFeignService.ViewGriddlerMessageDetail(messageManager.getMessageId());
+            Griddler griddler = griddlerFeignService.selectPlaceGriddler(messageManager.getGriddlerId());
+            ViewPageDTO viewPageDTO = new ViewPageDTO(messageManager, messageGriddler, griddler.getName(), s);
+            response.put("data",viewPageDTO);
+            response.put("message","当前信息已由网格员确认");
+            response.put("success",true);
+
+        }else {
+            response.put("data",null);
+            response.put("success",false);
+
+        }
+        return response;
     }
 }

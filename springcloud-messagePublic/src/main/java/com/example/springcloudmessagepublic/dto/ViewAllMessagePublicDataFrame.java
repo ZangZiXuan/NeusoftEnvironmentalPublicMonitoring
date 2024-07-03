@@ -1,5 +1,8 @@
 package com.example.springcloudmessagepublic.dto;
 
+import com.example.springcloudapi.dao.entity.MessagePublic;
+import com.example.springcloudapi.dao.entity.Public;
+import com.example.springcloudmessagemanager.dto.ViewPageDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,13 +19,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Data
 public class ViewAllMessagePublicDataFrame {
-    private String messageId;
-    private String publicName;
-    private String provinceName;
-    private String cityName;
-    private int level;
-    private String date;
-    private String time;
-
-
+    private ViewPageDTO viewPageDTO;
+    private MessagePublic messagePublic;
+    private Public aPublic;
 }

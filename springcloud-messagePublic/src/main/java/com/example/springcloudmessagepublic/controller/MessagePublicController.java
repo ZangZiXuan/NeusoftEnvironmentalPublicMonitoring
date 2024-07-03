@@ -5,20 +5,19 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.springcloudapi.dao.dto.PlaceDTO;
-import com.example.springcloudapi.dao.entity.MessagePublic;
+import com.example.springcloudapi.dao.entity.*;
 import com.example.springcloudapi.dao.dto.MessagePublicDTO;
-import com.example.springcloudapi.dao.entity.City;
-import com.example.springcloudapi.dao.entity.Province;
-import com.example.springcloudapi.dao.entity.Public;
 import com.example.springcloudapi.mapper.CityMapper;
 import com.example.springcloudapi.mapper.ProvinceMapper;
 import com.example.springcloudapi.utils.HttpResponseEntity;
 import com.example.springcloudapi.utils.UUIDUtil;
+import com.example.springcloudmessagemanager.dto.ViewPageDTO;
 import com.example.springcloudmessagepublic.dto.DigitalMessagePublicDTO;
 import com.example.springcloudmessagepublic.dto.MessagePublicPageDTO;
 import com.example.springcloudmessagepublic.dto.ViewAllMessagePublicDataFrame;
 import com.example.springcloudmessagepublic.feign.CitiesFeignService;
 
+import com.example.springcloudmessagepublic.feign.MessageManagerFegnService;
 import com.example.springcloudmessagepublic.feign.PublicFeignService;
 import com.example.springcloudmessagepublic.mapper.MessagePublicMapper;
 import com.example.springcloudmessagepublic.service.impl.MessagePublicServiceImpl;
@@ -326,6 +325,39 @@ public class MessagePublicController {
         }
     }
 
+    @Autowired
+    MessageManagerFegnService messageManagerFegnService;
+
+
+    /**
+     * 查看当前Message的分配情况
+     * 如果已经指派了
+     * 要显示指派信息
+     */
+    @PostMapping("/selectMessagePublicAssigned")
+    public Map<String,Object> selectMessagePublicAssigned(@RequestParam("messageId") String messageId) {
+        HashMap<String, Object> response = new HashMap<>();
+        Object data = messageManagerFegnService.viewPageMessageManager(messageId).get("data");
+        ObjectMapper objectMapper = new ObjectMapper();
+        ViewPageDTO viewPageDTO = objectMapper.convertValue(data, ViewPageDTO.class);
+        MessagePublic messagePublic = messagePublicMapper.selectOne(Wrappers.<MessagePublic>lambdaQuery()
+                .eq(MessagePublic::getId, messageId));
+        Public aPublic = publicFeignService.getPublicById(messagePublic.getPublicId());
+        ViewAllMessagePublicDataFrame viewAllMessagePublicDataFrame = new ViewAllMessagePublicDataFrame(viewPageDTO, messagePublic, aPublic);
+
+        if(messagePublic.getStatus() == 0) {
+                response.put("success", false);
+                response.put("message", "当前还未指派");
+                response.put("data",new ViewAllMessagePublicDataFrame(null,messagePublic,aPublic));
+                return response;
+
+            }else {
+                response.put("success", true);
+                response.put("message", "某个id的提交信息情况的记录");
+                response.put("data",viewAllMessagePublicDataFrame);
+                return response;
+            }
+    }
 
     /**
      * 分页查询

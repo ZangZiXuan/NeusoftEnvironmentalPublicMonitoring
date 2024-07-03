@@ -1,6 +1,9 @@
 package com.example.springcloudmessagemanager.feign;
 
+import com.example.springcloudapi.dao.entity.Griddler;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @Author Zang Xinrui
@@ -10,4 +13,6 @@ import org.springframework.cloud.openfeign.FeignClient;
  */
 @FeignClient(name = "springcloud-griddler",url = "localhost:8082")
 public interface GriddlerFeignService {
+    @GetMapping("/griddler/findGriddlerName")
+    public Griddler selectPlaceGriddler(@RequestParam("griddlerId") String griddlerId);
 }

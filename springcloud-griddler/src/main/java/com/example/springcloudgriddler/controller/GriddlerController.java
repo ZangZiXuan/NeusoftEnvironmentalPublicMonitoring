@@ -90,10 +90,10 @@ public class GriddlerController {
      * @param cityId 城市id
      * @return Map
      */
-    @RequestMapping("/selectPlaceGriddler")
+    @GetMapping("/selectPlaceGriddler")
     public Map<String,Object> selectPlaceGriddler(@RequestParam("offsiteStatus") int offsiteStatus,
-                                                  @RequestParam("provinceId") int provinceId,
-                                                  @RequestParam("cityId") int cityId) {
+                                                  @RequestParam("provinceId") String provinceId,
+                                                  @RequestParam("cityId") String cityId) {
         HashMap<String, Object> response = new HashMap<>();
         if(offsiteStatus != 0) {
             List<Griddler> griddlers = griddlerMapper.selectList(Wrappers.<Griddler>lambdaQuery().eq(Griddler::getStatuses, 0)
@@ -120,6 +120,9 @@ public class GriddlerController {
     }
 
 
-
-
+    @GetMapping("/findGriddlerName")
+    public Griddler selectPlaceGriddler(@RequestParam("griddlerId") String griddlerId) {
+        Griddler griddler = griddlerMapper.selectOne(Wrappers.<Griddler>lambdaQuery().eq(Griddler::getId, griddlerId));
+        return griddler;
+    }
 }

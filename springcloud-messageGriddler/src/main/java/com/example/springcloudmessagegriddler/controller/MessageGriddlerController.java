@@ -656,6 +656,17 @@ filteredMessageGriddlerList.sort(Comparator.comparing(MessageGriddler::getAqiLev
         result.put("aqi", AQICount);
         return HttpResponseEntity.success("get province count", result);
     }
+    @GetMapping("/ViewGriddlerMessageDetail")
+    public MessageGriddler ViewGriddlerMessageDetail(@RequestParam("messageId") String messageId) {
+        MessageGriddler messageGriddler = messageGriddlerMapper.selectOne(Wrappers.<MessageGriddler>lambdaQuery()
+                .eq(MessageGriddler::getMessagePublicId, messageId)
+                .eq(MessageGriddler::getStatus,1));
+        if (messageGriddler != null) {
+            return messageGriddler;
+        }else {
+            return null;
+        }
     }
+}
 
 
