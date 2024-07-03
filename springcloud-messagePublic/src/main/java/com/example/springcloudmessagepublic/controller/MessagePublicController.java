@@ -256,11 +256,11 @@ public class MessagePublicController {
     @Autowired
     MessagePublicServiceImpl messagePublicService;
 
-    @GetMapping("/messagePublicPage/{current}/{size}")
-    public Map<String, Object> messagePublicPage(@PathVariable("current") Integer current, @PathVariable("size") Integer size) {
-        QueryWrapper<MessagePublic> queryWrapper = new QueryWrapper<>();
-        return messagePublicService.getPaginatedMessagePublics(current, size, queryWrapper);
-    }
+//    @GetMapping("/messagePublicPage/{current}/{size}")
+//    public Map<String, Object> messagePublicPage(@PathVariable("current") Integer current, @PathVariable("size") Integer size) {
+//        QueryWrapper<MessagePublic> queryWrapper = new QueryWrapper<>();
+//        return messagePublicService.getPaginatedMessagePublics(current, size, queryWrapper);
+//    }
 
     @GetMapping("/viewSomeMessagePublic")
     public Map<String, Object> viewSomeMessagePublic(

@@ -93,20 +93,21 @@ public class MessageManagerController {
         for(MessageManager messageManager:messageManagerList) {
 
             Object data = messagePublicFeignService.selectMessagePublic(messageManager.getMessageId()).get("data");
+
             System.out.println(data);
 
 
             // 检查data是否为空
             if (data != null) {
                 ObjectMapper objectMapper = new ObjectMapper();
-                MessagePublic messagePublic = objectMapper.convertValue(data, MessagePublic.class);
+                MessagePublicDTO messagePublic = objectMapper.convertValue(data, MessagePublicDTO.class);
 
-                String provinceName = citiesFeignService.selectProvinceName(messagePublic.getProvinceId());
-                String cityName = citiesFeignService.selectCityName(messagePublic.getCityId());
-                int level = messagePublic.getLevel();
-                String address = messagePublic.getAddress();
-                Date date = messagePublic.getDate();
-                ShowDetailDTO showDetailDTO = new ShowDetailDTO(provinceName, cityName, level, address, date,messagePublic.getId());
+                String provinceName = citiesFeignService.selectProvinceName(messagePublic.getMessagePublic().getProvinceId());
+                String cityName = citiesFeignService.selectCityName(messagePublic.getMessagePublic().getCityId());
+                int level = messagePublic.getMessagePublic().getLevel();
+                String address = messagePublic.getMessagePublic().getAddress();
+                Date date = messagePublic.getMessagePublic().getDate();
+                ShowDetailDTO showDetailDTO = new ShowDetailDTO(provinceName, cityName, level, address, date,messagePublic.getMessagePublic().getId());
 
                 list.add(showDetailDTO);
             }

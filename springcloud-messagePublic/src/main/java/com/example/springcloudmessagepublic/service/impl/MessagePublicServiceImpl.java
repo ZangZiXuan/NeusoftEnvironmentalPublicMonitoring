@@ -7,6 +7,7 @@ import com.example.springcloudapi.dao.dto.MessagePublicDTO;
 import com.example.springcloudapi.dao.entity.MessagePublic;
 import com.example.springcloudapi.dao.entity.Province;
 import com.example.springcloudapi.dao.entity.Public;
+import com.example.springcloudmessagepublic.dto.MessagePublicNumDTO;
 import com.example.springcloudmessagepublic.feign.CitiesFeignService;
 import com.example.springcloudmessagepublic.feign.PublicFeignService;
 import com.example.springcloudmessagepublic.mapper.MessagePublicMapper;
@@ -41,7 +42,7 @@ public class MessagePublicServiceImpl extends ServiceImpl<MessagePublicMapper,Me
 
     public Map<String, Object> getPaginatedMessagePublics(int current, int size, QueryWrapper<MessagePublic> queryWrapper) {
         Map<String, Object> response = new HashMap<>();
-        ArrayList<MessagePublicDTO> messagePublicDTOs = new ArrayList<>();
+        ArrayList<MessagePublicNumDTO> messagePublicDTOs = new ArrayList<>();
         Page<MessagePublic> page = new Page<>(current, size);
 
         Page<MessagePublic> messagePublicPage = messagePublicMapper.selectPage(page, queryWrapper);
@@ -63,9 +64,9 @@ public class MessagePublicServiceImpl extends ServiceImpl<MessagePublicMapper,Me
             ObjectMapper objectMapper1 = new ObjectMapper();
             Province province = objectMapper1.convertValue(data1, Province.class);
 
-            MessagePublicDTO messagePublicDTO = new MessagePublicDTO(
+            MessagePublicNumDTO messagePublicDTO = new MessagePublicNumDTO(
                     publicDetail, messagePublic, province.getProvinceName(),
-                    city, province.getShortTitle()
+                    city, province.getShortTitle(), (int) messagePublicPage.getTotal()
             );
             messagePublicDTOs.add(messagePublicDTO);
         }
