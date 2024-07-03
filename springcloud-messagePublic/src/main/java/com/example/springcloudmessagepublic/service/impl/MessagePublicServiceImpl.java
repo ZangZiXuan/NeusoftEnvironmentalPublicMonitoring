@@ -7,7 +7,6 @@ import com.example.springcloudapi.dao.dto.MessagePublicDTO;
 import com.example.springcloudapi.dao.entity.MessagePublic;
 import com.example.springcloudapi.dao.entity.Province;
 import com.example.springcloudapi.dao.entity.Public;
-import com.example.springcloudmessagepublic.dto.MessagePublicNumDTO;
 import com.example.springcloudmessagepublic.feign.CitiesFeignService;
 import com.example.springcloudmessagepublic.feign.PublicFeignService;
 import com.example.springcloudmessagepublic.mapper.MessagePublicMapper;
@@ -42,7 +41,7 @@ public class MessagePublicServiceImpl extends ServiceImpl<MessagePublicMapper,Me
 
     public Map<String, Object> getPaginatedMessagePublics(int current, int size, QueryWrapper<MessagePublic> queryWrapper) {
         Map<String, Object> response = new HashMap<>();
-        ArrayList<MessagePublicNumDTO> messagePublicDTOs = new ArrayList<>();
+        ArrayList<MessagePublicDTO> messagePublicDTOs = new ArrayList<>();
         Page<MessagePublic> page = new Page<>(current, size);
 
         Page<MessagePublic> messagePublicPage = messagePublicMapper.selectPage(page, queryWrapper);
@@ -64,9 +63,9 @@ public class MessagePublicServiceImpl extends ServiceImpl<MessagePublicMapper,Me
             ObjectMapper objectMapper1 = new ObjectMapper();
             Province province = objectMapper1.convertValue(data1, Province.class);
 
-            MessagePublicNumDTO messagePublicDTO = new MessagePublicNumDTO(
+            MessagePublicDTO messagePublicDTO = new MessagePublicDTO(
                     publicDetail, messagePublic, province.getProvinceName(),
-                    city, province.getShortTitle(), (int) messagePublicPage.getTotal()
+                    city, province.getShortTitle()
             );
             messagePublicDTOs.add(messagePublicDTO);
         }
@@ -75,6 +74,7 @@ public class MessagePublicServiceImpl extends ServiceImpl<MessagePublicMapper,Me
             response.put("success", true);
             response.put("message", "查询所有的公众监督员的提交记录分页成功");
             response.put("data", messagePublicDTOs);
+            response.put("result",messagePublicPage.getTotal());
         } else {
             response.put("success", false);
             response.put("message", "当前用户还未提交过反馈信息");
