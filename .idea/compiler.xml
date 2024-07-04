@@ -46,7 +46,7 @@
       <module name="NEPM" options="-parameters" />
       <module name="NEPS" options="-parameters" />
       <module name="NEPV" options="-parameters" />
-      <module name="neusoft-gateway" options="-parameters" />
+      <module name="neusoft-gateway" options="" />
       <module name="springcloud-api" options="" />
       <module name="springcloud-griddler" options="" />
       <module name="springcloud-login" options="" />

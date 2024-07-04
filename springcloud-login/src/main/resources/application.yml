@@ -24,3 +24,8 @@ spring:
         server-addr: 127.0.0.1:8848
 server:
   port: 8083
+feign:
+  hystrix:
+    enabled: true        #在feign中开启hystrix熔断机制
+  sentinel:
+    enabled: true # 启用 Feign 对 Sentinel 的支持

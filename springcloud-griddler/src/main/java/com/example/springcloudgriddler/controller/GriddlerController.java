@@ -96,7 +96,8 @@ public class GriddlerController {
                                                   @RequestParam("cityId") String cityId) {
         HashMap<String, Object> response = new HashMap<>();
         if(offsiteStatus != 0) {
-            List<Griddler> griddlers = griddlerMapper.selectList(Wrappers.<Griddler>lambdaQuery().eq(Griddler::getStatuses, 0)
+            List<Griddler> griddlers = griddlerMapper.selectList(Wrappers.<Griddler>lambdaQuery()
+                    .eq(Griddler::getStatuses, 0)
                     .eq(Griddler::getProvinceId, provinceId)
                     .eq(Griddler::getCityId, cityId));
 
@@ -124,5 +125,26 @@ public class GriddlerController {
     public Griddler selectPlaceGriddler(@RequestParam("griddlerId") String griddlerId) {
         Griddler griddler = griddlerMapper.selectOne(Wrappers.<Griddler>lambdaQuery().eq(Griddler::getId, griddlerId));
         return griddler;
+    }
+
+    @GetMapping("/selectOneGriddlerAssign")
+    public Map<String,Object> selectOneGriddlerAssign(@RequestParam("cityId") String cityId,
+                                            @RequestParam("provinceId") String provinceId) {
+        List<Griddler> griddlers = griddlerMapper.selectList(Wrappers.<Griddler>lambdaQuery()
+                .eq(Griddler::getStatuses, 0)
+                .eq(Griddler::getProvinceId, provinceId)
+                .eq(Griddler::getCityId, cityId));
+        HashMap<String, Object> response = new HashMap<>();
+        if (griddlers.isEmpty()) {
+            response.put("message","该地区无可用网格员");
+            response.put("data",null);
+            response.put("success",false);
+            return response;
+        }else {
+            response.put("message","查询该地区所有的网格员成功");
+            response.put("data",griddlers);
+            response.put("success",true);
+            return response;
+        }
     }
 }
