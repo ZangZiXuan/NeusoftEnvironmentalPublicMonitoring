@@ -1,5 +1,6 @@
 package com.example.springcloudgriddler.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.springcloudapi.dao.dto.Dept;
@@ -128,23 +129,36 @@ public class GriddlerController {
     }
 
     @GetMapping("/selectOneGriddlerAssign")
-    public Map<String,Object> selectOneGriddlerAssign(@RequestParam("cityId") String cityId,
-                                            @RequestParam("provinceId") String provinceId) {
-        List<Griddler> griddlers = griddlerMapper.selectList(Wrappers.<Griddler>lambdaQuery()
-                .eq(Griddler::getStatuses, 0)
-                .eq(Griddler::getProvinceId, provinceId)
-                .eq(Griddler::getCityId, cityId));
+    public Map<String, Object> selectOneGriddlerAssign(
+            @RequestParam(value = "cityId", required = false) String cityId,
+            @RequestParam(value = "provinceId", required = false) String provinceId) {
+
+        // 创建查询条件
+        LambdaQueryWrapper<Griddler> queryWrapper = Wrappers.<Griddler>lambdaQuery()
+                .eq(Griddler::getStatuses, 0);
+
+        if (provinceId != null) {
+            queryWrapper.eq(Griddler::getProvinceId, provinceId);
+        }
+        if (cityId != null) {
+            queryWrapper.eq(Griddler::getCityId, cityId);
+        }
+
+        // 执行查询
+        List<Griddler> griddlers = griddlerMapper.selectList(queryWrapper);
+
+        // 创建响应
         HashMap<String, Object> response = new HashMap<>();
         if (griddlers.isEmpty()) {
-            response.put("message","该地区无可用网格员");
-            response.put("data",null);
-            response.put("success",false);
-            return response;
-        }else {
-            response.put("message","查询该地区所有的网格员成功");
-            response.put("data",griddlers);
-            response.put("success",true);
-            return response;
+            response.put("message", "该地区无可用网格员");
+            response.put("data", null);
+            response.put("success", false);
+        } else {
+            response.put("message", "查询该地区所有的网格员成功");
+            response.put("data", griddlers);
+            response.put("success", true);
         }
+        return response;
     }
+
 }
