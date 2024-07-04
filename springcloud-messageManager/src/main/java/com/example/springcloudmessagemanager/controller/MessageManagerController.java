@@ -45,8 +45,8 @@ public class MessageManagerController {
     public Map<String,Object> creatAssignedMessageManager(@RequestBody MessageManager messageManager) {
 
         int insert = messageManagerMapper.insert(messageManager);
+        messagePublicFeignService.updateMessagePublic(messageManager.getMessageId());
         Map<String, Object> response = new HashMap<>();
-
         if(insert == 1){
             response.put("success", true);
             response.put("message", "公众管理员端的提交添加成功");

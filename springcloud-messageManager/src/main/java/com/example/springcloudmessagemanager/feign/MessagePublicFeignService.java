@@ -20,4 +20,6 @@ public interface MessagePublicFeignService {
     public Map<String,Object> ViewMyMessagePublic(@PathVariable("publicId") String publicId);
     @PostMapping("/messagePublic/selectMessagePublic")
     public Map<String,Object> selectMessagePublic(@RequestParam("messageId") String messageId);
+    @GetMapping("/updateMessagePublic")
+    public int updateMessagePublic(@RequestParam("messageId") String messageId);
 }

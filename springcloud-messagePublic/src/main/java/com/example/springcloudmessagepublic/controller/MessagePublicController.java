@@ -2,6 +2,7 @@ package com.example.springcloudmessagepublic.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.springcloudapi.dao.dto.PlaceDTO;
@@ -49,6 +50,23 @@ public class MessagePublicController {
     CitiesFeignService citiesFeignService;
     @Autowired
     PublicFeignService publicFeignService;
+
+    /**
+     * 当已经分派的时候
+     * 要更新
+     */
+    @GetMapping("/updateMessagePublic")
+    public int updateMessagePublic(@RequestParam("messageId") String messageId) {
+        UpdateWrapper<MessagePublic> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("message_id", messageId).set("status", 1);
+
+        return messagePublicMapper.update(null, updateWrapper);
+    }
+
+
+
+
+
     /**
      * 公众监督员端的提交
      * @param messagePublic
