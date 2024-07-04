@@ -92,34 +92,40 @@ public class GriddlerController {
      * @return Map
      */
     @GetMapping("/selectPlaceGriddler")
-    public Map<String,Object> selectPlaceGriddler(@RequestParam("offsiteStatus") int offsiteStatus,
-                                                  @RequestParam("provinceId") String provinceId,
-                                                  @RequestParam("cityId") String cityId) {
+    public Map<String, Object> selectPlaceGriddler(@RequestParam("offsiteStatus") int offsiteStatus,
+                                                   @RequestParam(value = "provinceId", required = false) String provinceId,
+                                                   @RequestParam(value = "cityId", required = false) String cityId) {
         HashMap<String, Object> response = new HashMap<>();
-        if(offsiteStatus != 0) {
-            List<Griddler> griddlers = griddlerMapper.selectList(Wrappers.<Griddler>lambdaQuery()
-                    .eq(Griddler::getStatuses, 0)
-                    .eq(Griddler::getProvinceId, provinceId)
-                    .eq(Griddler::getCityId, cityId));
+        if (offsiteStatus != 0) {
+            LambdaQueryWrapper<Griddler> queryWrapper = Wrappers.<Griddler>lambdaQuery()
+                    .eq(Griddler::getStatuses, 0);
 
-            if(griddlers.isEmpty()) {
-                response.put("message","没有符合条件的网格员");
-                response.put("data",null);
-                response.put("success",false);
-                return response;
-            }else {
-                response.put("data",griddlers);
+            if (provinceId != null && !provinceId.isEmpty()) {
+                queryWrapper.eq(Griddler::getProvinceId, provinceId);
+            }
+            if (cityId != null && !cityId.isEmpty()) {
+                queryWrapper.eq(Griddler::getCityId, cityId);
+            }
+
+            List<Griddler> griddlers = griddlerMapper.selectList(queryWrapper);
+
+            if (griddlers.isEmpty()) {
+                response.put("message", "没有符合条件的网格员");
+                response.put("data", null);
+                response.put("success", false);
+            } else {
+                response.put("data", griddlers);
                 response.put("success", true);
                 response.put("message", "筛选异地指派的所有可用的网格员");
-                return response;
             }
-        }else  {
-            response.put("data",null);
+        } else {
+            response.put("data", null);
             response.put("success", false);
             response.put("message", "不是异地指派不应该调用当前接口");
-            return response;
         }
+        return response;
     }
+
 
 
     @GetMapping("/findGriddlerName")
