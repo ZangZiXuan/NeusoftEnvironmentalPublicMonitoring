@@ -43,7 +43,7 @@ public class MessageManagerController {
 
     @PostMapping("/creatAssignedMessageManager")
     public Map<String,Object> creatAssignedMessageManager(@RequestBody MessageManager messageManager) {
-
+        messageManager.setId(UUID.randomUUID().toString());
         int insert = messageManagerMapper.insert(messageManager);
         messagePublicFeignService.updateMessagePublic(messageManager.getMessageId());
         Map<String, Object> response = new HashMap<>();
