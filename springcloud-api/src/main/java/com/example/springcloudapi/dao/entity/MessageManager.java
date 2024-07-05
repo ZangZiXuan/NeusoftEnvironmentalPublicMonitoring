@@ -30,4 +30,13 @@ public class MessageManager {
     private String provinceId;
     private String cityId;
     private int status;
+
+    public MessageManager(String messageId, String griddlerId, int statusManager, String provinceId, String cityId, int status) {
+        this.messageId = messageId;
+        this.griddlerId = griddlerId;
+        this.statusManager = statusManager;
+        this.provinceId = provinceId;
+        this.cityId = cityId;
+        this.status = status;
+    }
 }

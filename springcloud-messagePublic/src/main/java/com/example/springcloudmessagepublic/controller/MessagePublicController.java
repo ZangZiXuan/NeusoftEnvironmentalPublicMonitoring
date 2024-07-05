@@ -58,7 +58,7 @@ public class MessagePublicController {
     @GetMapping("/updateMessagePublic")
     public int updateMessagePublic(@RequestParam("messageId") String messageId) {
         UpdateWrapper<MessagePublic> updateWrapper = new UpdateWrapper<>();
-        updateWrapper.eq("message_id", messageId).set("status", 1);
+        updateWrapper.eq("id", messageId).set("status", 1);
 
         return messagePublicMapper.update(null, updateWrapper);
     }
