@@ -174,19 +174,20 @@ public class MessageManagerController {
                         .eq(MessageManager::getMessageId, messageId)
 
         );
+
         String s = "";
         if(messageManager!=null && messageManager.getStatus()==0) {
             s += "已指派，等待网格员确认";
 
             Griddler griddler = griddlerFeignService.selectPlaceGriddler(messageManager.getGriddlerId());
-            response.put("data",new ViewPageDTO(messageManager,griddler.getName(),s));
+            response.put("data",new ViewPageDTO(messageManager,griddler,s));
             response.put("message","当前信息已指派，等待网格员确认");
 
         } else if(messageManager!=null && messageManager.getStatus()==1){
             s += "已确认";
             MessageGriddler messageGriddler = messageGriddlerFeignService.ViewGriddlerMessageDetail(messageManager.getMessageId());
             Griddler griddler = griddlerFeignService.selectPlaceGriddler(messageManager.getGriddlerId());
-            ViewPageDTO viewPageDTO = new ViewPageDTO(messageManager, messageGriddler, griddler.getName(), s);
+            ViewPageDTO viewPageDTO = new ViewPageDTO(messageManager, messageGriddler, griddler, s);
             response.put("data",viewPageDTO);
             response.put("message","当前信息已由网格员确认");
             response.put("success",true);

@@ -19,13 +19,13 @@ import lombok.NoArgsConstructor;
 public class ViewPageDTO {
     private MessageManager messageManager;
     private MessageGriddler messageGriddler;
-    private String griddlerName;
+    private Griddler griddler;
     private String s;
 
 
-    public ViewPageDTO(MessageManager messageManager,String griddlerName, String s) {
+    public ViewPageDTO(MessageManager messageManager,Griddler griddler, String s) {
         this.messageManager = messageManager;
-        this.griddlerName = griddlerName;
+        this.griddler = griddler;
         this.s = s;
     }
 }
