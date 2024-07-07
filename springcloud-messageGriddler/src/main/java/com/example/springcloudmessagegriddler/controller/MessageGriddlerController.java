@@ -12,20 +12,20 @@ import com.example.springcloudapi.mapper.ProvinceMapper;
 import com.example.springcloudapi.utils.CommUtil;
 import com.example.springcloudapi.utils.HttpResponseEntity;
 import com.example.springcloudmessagegriddler.dto.DigitalScreenMessageGriddler;
-import com.example.springcloudmessagegriddler.feign.CitiesFeignService;
-import com.example.springcloudmessagegriddler.feign.MessageManagerFeignService;
-import com.example.springcloudmessagegriddler.feign.MessagePublicFeignService;
-
-import com.example.springcloudmessagegriddler.feign.PublicFeignService;
+import com.example.springcloudmessagegriddler.dto.MessageGriddlerViewDTO;
+import com.example.springcloudmessagegriddler.feign.*;
+import com.example.springcloudmessagegriddler.service.MessageGriddlerService;
+import com.example.springcloudmessagepublic.dto.MessagePublicPageDTO;
 import com.example.springcloudmessagegriddler.mapper.MessageGriddlerMapper;
 
 import com.example.springcloudmessagegriddler.service.AQIService;
-import com.example.springcloudmessagepublic.dto.MessagePublicPageDTO;
+//import com.example.springcloudmessagepublic.dto.messagePublicPageDTO;
 import com.example.springcloudmessagepublic.mapper.MessagePublicMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -80,6 +80,7 @@ public class MessageGriddlerController {
 //            response.put("success", false);
 //            response.put("message", "网格员端的提交实测数据添加失败");
 //            response.put("data",null);
+//            response.put("data",null);
 //            return response;
 //        }
 //    }
@@ -133,26 +134,49 @@ public class MessageGriddlerController {
      * 查看网格员确认的所有信息
      * @return Map
      */
+    @Autowired
+    GriddlerFeignService griddlerFeignService;
+
+    @Autowired
+    MessageGriddlerService messageGriddlerService;
+
+//
 
     @GetMapping("/viewAllMessageGriddler")
-    public Map<String,Object> viewAllMessageGriddler() {
-        List<MessageGriddler> messageGriddlerList = messageGriddlerMapper.selectList(Wrappers.<MessageGriddler>lambdaQuery().eq(MessageGriddler::getStatus,1));
+    public Map<String, Object> viewAllMessageGriddler(
+            @RequestParam(value = "provinceId", required = false) String provinceId,
+            @RequestParam(value = "cityId", required = false) String cityId,
+            @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date date,
+            @RequestParam(value = "current", required = true) Integer current,
+            @RequestParam(value = "size", required = true) Integer size) {
 
-        Map<String, Object> response = new HashMap<>();
-
-        if(!messageGriddlerList.isEmpty()){
-            response.put("success", true);
-            response.put("message", "查看所有的网格员端的提交实测数据成功");
-            response.put("data",messageGriddlerList);
-            return response;
-        }else {
-            response.put("success", false);
-            response.put("message", "查看所有的网格员端的提交实测数据失败");
-            response.put("data",null);
-            //返回 400 Bad Request 表示请求不合法.(待推敲哪个状态码更合适)
-            return response;
+        QueryWrapper<MessagePublic> messagePublicQueryWrapper = new QueryWrapper<>();
+        if (provinceId != null) {
+            messagePublicQueryWrapper.eq("province_id", provinceId);
         }
+        if (cityId != null) {
+            messagePublicQueryWrapper.eq("city_id", cityId);
+        }
+        System.out.println("---------");
+        List<String> messagePublicIds = messagePublicFeignService.getAllMessagePublicIds(messagePublicQueryWrapper);
+        System.out.println(messagePublicIds);
+        // Prepare the queryWrapper for MessageGriddler
+        QueryWrapper<MessageGriddler> messageGriddlerQueryWrapper = new QueryWrapper<>();
+        if (!messagePublicIds.isEmpty()) {
+            messageGriddlerQueryWrapper.in("message_public_id", messagePublicIds)
+                    .eq("status",1);
+        }
+        if (date != null) {
+            SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy-MM-dd");
+            String dateString = dbFormat.format(date);
+            messageGriddlerQueryWrapper.likeRight("time", dateString).eq("status",1);
+        }
+
+        // Call the service method with the new queryWrapper
+        return messageGriddlerService.getPaginatedMessageGriddlers(current, size, messageGriddlerQueryWrapper);
     }
+
+
     /**
      * 管理员端
      * 以下均为统计信息模块

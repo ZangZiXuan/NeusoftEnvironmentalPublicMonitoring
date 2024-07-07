@@ -1,5 +1,6 @@
 package com.example.springcloudmessagegriddler.feign;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.springcloudapi.dao.entity.MessagePublic;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -41,4 +42,7 @@ public interface MessagePublicFeignService {
      */
     @GetMapping("/messagePublic/countAlreadyAssigned")
     public int countAlreadyAssigned();
+
+    @PostMapping("/messagePublic/getAllMessagePublicIds")
+    public List<String> getAllMessagePublicIds(QueryWrapper<MessagePublic> messagePublicQueryWrapper);
 }

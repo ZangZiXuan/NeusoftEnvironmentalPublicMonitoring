@@ -65,7 +65,15 @@ public class MessagePublicController {
 
 
 
-
+    @PostMapping("/getAllMessagePublicIds")
+    public List<String> getAllMessagePublicIds(QueryWrapper<MessagePublic> messagePublicQueryWrapper) {
+        // Get the filtered messagePublicIds
+        List<String> messagePublicIds = messagePublicMapper.selectList(messagePublicQueryWrapper).stream()
+                .map(MessagePublic::getId)
+                .collect(Collectors.toList());
+        System.out.println("方法没问题");
+        return messagePublicIds;
+    }
 
     /**
      * 公众监督员端的提交
@@ -284,7 +292,8 @@ public class MessagePublicController {
             @RequestParam(value = "provinceId", required = false) String provinceId,
             @RequestParam(value = "cityId", required = false) String cityId,
             @RequestParam(value = "level", required = false) String level,
-            @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date date,
+            @RequestParam(value = "date", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date date,
             @RequestParam(value = "status", required = false) Integer status,
             @RequestParam(value = "current", required = true) Integer current,
             @RequestParam(value = "size", required = true) Integer size) throws ParseException {

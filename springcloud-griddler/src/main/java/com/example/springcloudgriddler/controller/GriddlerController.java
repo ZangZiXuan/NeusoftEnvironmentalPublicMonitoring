@@ -167,4 +167,10 @@ public class GriddlerController {
         return response;
     }
 
+    @GetMapping("/selectGriddlerName")
+    public String selectGriddlerName(@RequestParam("griddlerId") String griddlerId) {
+        Griddler griddler = griddlerMapper.selectOne(Wrappers.<Griddler>lambdaQuery()
+                .eq(Griddler::getId, griddlerId));
+        return griddler.getName();
+    }
 }
