@@ -58,7 +58,7 @@ public class MessageGriddlerController {
     public Map<String,Object> viewOneMessageGriddler(@RequestParam("id") String id) {
         MessageGriddler messageGriddler = messageGriddlerMapper.selectOne(Wrappers.<MessageGriddler>lambdaQuery()
                 .eq(MessageGriddler::getId, id));
-        Object data = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("result");
+        Object data = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("data");
         ObjectMapper objectMapper = new ObjectMapper();
         MessagePublicPageDTO messagePublic = objectMapper.convertValue(data, MessagePublicPageDTO.class);
         String griddlerName = griddlerFeignService.selectGriddlerName(messageGriddler.getGriddlerId());
