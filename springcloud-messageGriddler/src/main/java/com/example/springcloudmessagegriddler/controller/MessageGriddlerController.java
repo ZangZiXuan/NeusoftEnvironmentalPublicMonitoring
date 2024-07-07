@@ -188,22 +188,19 @@ public class MessageGriddlerController {
             @RequestParam(value = "current", required = true) Integer current,
             @RequestParam(value = "size", required = true) Integer size) {
 
-        QueryWrapper<MessagePublic> messagePublicQueryWrapper = new QueryWrapper<>();
-        if (provinceId != null) {
-            messagePublicQueryWrapper.eq("province_id", provinceId);
-        }
-        if (cityId != null) {
-            messagePublicQueryWrapper.eq("city_id", cityId);
-        }
-        System.out.println("---------");
-        List<String> messagePublicIds = messagePublicFeignService.getAllMessagePublicIds(messagePublicQueryWrapper);
-        System.out.println(messagePublicIds);
-        // Prepare the queryWrapper for MessageGriddler
+        System.out.println("Received provinceId: " + provinceId);
+        System.out.println("Received cityId: " + cityId);
+        System.out.println("Received date: " + date);
+        System.out.println("Received current: " + current);
+        System.out.println("Received size: " + size);
+        List<String> messagePublicIds = messagePublicFeignService.findNoRequire(cityId,provinceId);
         QueryWrapper<MessageGriddler> messageGriddlerQueryWrapper = new QueryWrapper<>();
+
         if (!messagePublicIds.isEmpty()) {
             messageGriddlerQueryWrapper.in("message_public_id", messagePublicIds)
                     .eq("status",1);
         }
+
         if (date != null) {
             SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy-MM-dd");
             String dateString = dbFormat.format(date);

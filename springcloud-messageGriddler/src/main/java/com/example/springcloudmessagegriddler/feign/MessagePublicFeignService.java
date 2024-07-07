@@ -45,4 +45,9 @@ public interface MessagePublicFeignService {
 
     @PostMapping("/messagePublic/getAllMessagePublicIds")
     public List<String> getAllMessagePublicIds(QueryWrapper<MessagePublic> messagePublicQueryWrapper);
+
+
+    @GetMapping("/messagePublic/findNoRequire")
+    public List<String> findNoRequire(@RequestParam(value = "cityId",required = false) String cityId,
+                                      @RequestParam(value = "provinceId",required = false) String provinceId);
 }

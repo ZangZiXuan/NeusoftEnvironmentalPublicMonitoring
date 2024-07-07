@@ -475,5 +475,15 @@ public class MessagePublicController {
                 .eq(MessagePublic::getStatus, 1)).size();
         return size;
     }
+    @GetMapping("/findNoRequire")
+    public List<String> findNoRequire(@RequestParam(value = "cityId",required = false) String cityId,
+                                             @RequestParam(value = "provinceId",required = false) String provinceId) {
+        List<String> messagePublicId = messagePublicMapper.selectList(Wrappers.<MessagePublic>lambdaQuery()
+                        .eq(MessagePublic::getCityId, cityId)
+                        .eq(MessagePublic::getProvinceId, provinceId))
+                .stream().map(MessagePublic::getId).collect(Collectors.toList());
+        return messagePublicId;
+    }
+
 }
 
