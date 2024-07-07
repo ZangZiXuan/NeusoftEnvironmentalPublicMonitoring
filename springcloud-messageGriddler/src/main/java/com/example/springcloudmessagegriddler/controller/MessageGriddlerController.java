@@ -244,9 +244,9 @@ public class MessageGriddlerController {
             Object messagePublic1 = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("result");
             System.out.println(messagePublic1);
             ObjectMapper objectMapper = new ObjectMapper();
-            MessagePublicPageDTO messagePublic = objectMapper.convertValue(messagePublic1, MessagePublicPageDTO.class);
+            MessagePublic messagePublic = objectMapper.convertValue(messagePublic1, MessagePublic.class);
 
-            Object province1 = citiesFeignService.selectProvince(messagePublic.getMessagePublic().getProvinceId()).get("data");
+            Object province1 = citiesFeignService.selectProvince(messagePublic.getProvinceId()).get("data");
             ObjectMapper objectMapper2 = new ObjectMapper();
             Province province = objectMapper2.convertValue(province1, Province.class);
 
