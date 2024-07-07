@@ -173,4 +173,10 @@ public class GriddlerController {
                 .eq(Griddler::getId, griddlerId));
         return griddler.getName();
     }
+    @GetMapping("/selectGriddlerPhone")
+    public String selectGriddlerPhone(@RequestParam("griddlerId") String griddlerId) {
+        Griddler griddler = griddlerMapper.selectOne(Wrappers.<Griddler>lambdaQuery()
+                .eq(Griddler::getId, griddlerId));
+        return griddler.getPhone();
+    }
 }

@@ -22,7 +22,7 @@ public class AQIController {
     @Autowired
     AQIMapper aqiMapper;
     @PostMapping("/findAqiDetails")
-    public AQI findAqiDetails(@RequestBody String aqiLevel) {
+    public AQI findAqiDetails(@RequestBody int aqiLevel) {
         AQI aqi = aqiMapper.selectOne(Wrappers.<AQI>lambdaQuery().eq(AQI::getAqiId, aqiLevel));
         if(aqi!=null) {
             return aqi;

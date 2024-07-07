@@ -11,6 +11,7 @@ import com.example.springcloudapi.dao.dto.MessageGriddlerDTO;
 import com.example.springcloudapi.mapper.ProvinceMapper;
 import com.example.springcloudapi.utils.CommUtil;
 import com.example.springcloudapi.utils.HttpResponseEntity;
+import com.example.springcloudmessagegriddler.dto.AQIViewDetailsDTO;
 import com.example.springcloudmessagegriddler.dto.DigitalScreenMessageGriddler;
 import com.example.springcloudmessagegriddler.dto.MessageGriddlerViewDTO;
 import com.example.springcloudmessagegriddler.feign.*;
@@ -53,6 +54,43 @@ public class MessageGriddlerController {
     @Autowired
     CitiesFeignService citiesFeignService;
 
+    @GetMapping("/viewOneMessageGriddler")
+    public Map<String,Object> viewOneMessageGriddler(@RequestParam("id") String id) {
+        MessageGriddler messageGriddler = messageGriddlerMapper.selectOne(Wrappers.<MessageGriddler>lambdaQuery()
+                .eq(MessageGriddler::getId, id));
+        Object data = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("data");
+        ObjectMapper objectMapper = new ObjectMapper();
+        MessagePublicPageDTO messagePublic = objectMapper.convertValue(data, MessagePublicPageDTO.class);
+        String griddlerName = griddlerFeignService.selectGriddlerName(messageGriddler.getGriddlerId());
+        String griddlerPhone = griddlerFeignService.selectGriddlerPhone(messageGriddler.getGriddlerId());
+        AQI aqiDetails = citiesFeignService.findAqiDetails(messageGriddler.getAqiLevel());
+        Date time = messageGriddler.getTime();
+        String publicName = messagePublic.getAPublic().getName();
+        String publicPhone = messagePublic.getAPublic().getPhone();
+        String address = messagePublic.getMessagePublic().getAddress();
+        Object data1 = citiesFeignService.selectProvince(messagePublic.getMessagePublic().getProvinceId()).get("data");
+        ObjectMapper objectMapper1 = new ObjectMapper();
+        Province province = objectMapper1.convertValue(data1, Province.class);
+        String description = messagePublic.getMessagePublic().getDescription();
+        String cityName = citiesFeignService.selectCityName(messagePublic.getMessagePublic().getCityId());
+        AQIViewDetailsDTO aqiViewDetailsDTO = new AQIViewDetailsDTO(messageGriddler.getId(), province.getProvinceName(), cityName,
+                address, messageGriddler.getAqiLevel(), aqiDetails.getAqiDescription(),
+                time, publicName, publicPhone, griddlerName, griddlerPhone, description);
+
+        Map<String, Object> response = new HashMap<>();
+
+        if(aqiViewDetailsDTO.getId()!= null) {
+            response.put("success",true);
+            response.put("message","管理员查看某个AQI数据的详细信息成功");
+            response.put("data",aqiViewDetailsDTO);
+            return response;
+        }else {
+            response.put("success", false);
+            response.put("message", "网格员端的提交实测数据添加失败");
+            response.put("data",null);
+            return response;
+        }
+    }
     /**
      * 网格员确认提交数据
      */
@@ -269,7 +307,7 @@ public class MessageGriddlerController {
             int num = Integer.parseInt(messageGriddlerMapper.selectCount(Wrappers.<MessageGriddler>lambdaQuery()
                     .eq(MessageGriddler::getAqiLevel, i)
                     .eq(MessageGriddler::getStatus, 1)).toString());
-            AQI aqiDetails = citiesFeignService.findAqiDetails(String.valueOf(i));
+            AQI aqiDetails = citiesFeignService.findAqiDetails(i);
             AQIDTO aqidto = new AQIDTO(i, aqiDetails.getDescription(), num);
             list.add(aqidto);
         }

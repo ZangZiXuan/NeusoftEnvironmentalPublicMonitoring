@@ -14,4 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface GriddlerFeignService {
     @GetMapping("/griddler/selectGriddlerName")
     public String selectGriddlerName(@RequestParam("griddlerId") String griddlerId);
+    @GetMapping("/griddler/selectGriddlerPhone")
+    public String selectGriddlerPhone(@RequestParam("griddlerId") String griddlerId);
 }

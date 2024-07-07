@@ -22,7 +22,7 @@ public interface CitiesFeignService {
     @GetMapping("/city/selectCityName")
     public String selectCityName(@RequestParam("cityId") String cityId);
     @PostMapping("/aqi/findAqiDetails")
-    public AQI findAqiDetails(@RequestBody String aqiLevel);
+    public AQI findAqiDetails(@RequestBody int aqiLevel);
 
     @GetMapping("/city/findAllCapitalCity")
     public List<String> findAllCapitalCity();
@@ -38,4 +38,5 @@ public interface CitiesFeignService {
     public List<String> selectProvinceId();
     @GetMapping("/city/selectCitiesIdByProvince")
     public List<String> getCitiesIdByProvinceId(@RequestParam("provinceId") String provinceId);
+
 }
