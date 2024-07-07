@@ -117,10 +117,12 @@ public class MessageGriddlerServiceImpl extends ServiceImpl<MessageGriddlerMappe
             response.put("success", true);
             response.put("message", "查看所有的网格员端的提交实测数据成功");
             response.put("data", messageGriddlerViewDTOList);
+            response.put("result",messageGriddlerPage.getTotal());
         } else {
             response.put("success", false);
             response.put("message", "查看所有的网格员端的提交实测数据失败");
             response.put("data", null);
+            response.put("result",null);
         }
         return response;
     }

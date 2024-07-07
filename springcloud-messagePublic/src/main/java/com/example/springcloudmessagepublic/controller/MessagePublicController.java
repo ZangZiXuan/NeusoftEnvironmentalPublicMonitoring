@@ -341,6 +341,7 @@ public class MessagePublicController {
             response.put("success", false);
             response.put("message", "当前用户还未提交过反馈信息");
             response.put("data",null);
+            response.put("result",null);
             //返回 400 Bad Request 表示请求不合法.(待推敲哪个状态码更合适)
             return response;
 
@@ -348,6 +349,7 @@ public class MessagePublicController {
             response.put("success", true);
             response.put("message", "某个id的公众监督员记录");
             response.put("data",messagePublicPageDTO);
+            response.put("result",messagePublic);
             return response;
         }
     }
@@ -470,7 +472,7 @@ public class MessagePublicController {
     @GetMapping("/countAlreadyAssigned")
     public int countAlreadyAssigned() {
         int size = messagePublicMapper.selectList(Wrappers.<MessagePublic>lambdaQuery()
-                .eq(MessagePublic::getStatus, 0)).size();
+                .eq(MessagePublic::getStatus, 1)).size();
         return size;
     }
 }

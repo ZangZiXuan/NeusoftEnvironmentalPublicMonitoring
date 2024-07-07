@@ -58,7 +58,7 @@ public class MessageGriddlerController {
     public Map<String,Object> viewOneMessageGriddler(@RequestParam("id") String id) {
         MessageGriddler messageGriddler = messageGriddlerMapper.selectOne(Wrappers.<MessageGriddler>lambdaQuery()
                 .eq(MessageGriddler::getId, id));
-        Object data = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("data");
+        Object data = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("result");
         ObjectMapper objectMapper = new ObjectMapper();
         MessagePublicPageDTO messagePublic = objectMapper.convertValue(data, MessagePublicPageDTO.class);
         String griddlerName = griddlerFeignService.selectGriddlerName(messageGriddler.getGriddlerId());
@@ -241,7 +241,7 @@ public class MessageGriddlerController {
 
         for (MessageGriddler messageGriddler : messageGriddlers) {
 
-            Object messagePublic1 = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("data");
+            Object messagePublic1 = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("result");
             System.out.println(messagePublic1);
             ObjectMapper objectMapper = new ObjectMapper();
             MessagePublicPageDTO messagePublic = objectMapper.convertValue(messagePublic1, MessagePublicPageDTO.class);
@@ -444,6 +444,7 @@ public class MessageGriddlerController {
                 .eq(MessageGriddler::getStatus, 1)).toString());
         result.put("report",countMessagePublic);
         result.put("task",countAlreadyAssigned);
+
         result.put("submission",submission);
         return HttpResponseEntity.response(true, "get procession", result);
     }
@@ -451,7 +452,7 @@ public class MessageGriddlerController {
     PublicFeignService publicFeignService;
 
     @GetMapping("/digitalScreenShowMessageGriddler")
-    public HttpResponseEntity digitalScreenShowMessageGriddler(@RequestParam("limitNum") Integer num ) {
+    public HttpResponseEntity digitalScreenShowMessageGriddler(@RequestParam("limitNum") Integer num) {
         if(num <= 0) return HttpResponseEntity.error("限制条数出现错误，请检查后重试");
         QueryWrapper<MessageGriddler> queryWrapper = new QueryWrapper<>();
         List<MessageGriddler> messageGriddlerList = messageGriddlerMapper.selectList(queryWrapper.orderByDesc("time"));
@@ -464,7 +465,7 @@ public class MessageGriddlerController {
                     break;
                 }else {
                     System.out.println(messageGriddler.getMessagePublicId());
-                    Object data = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("data");
+                    Object data = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("result");
                     System.out.println("data:"+data);
                     ObjectMapper objectMapper = new ObjectMapper();
                     MessagePublic messagePublic = objectMapper.convertValue(data, MessagePublic.class);
@@ -488,6 +489,7 @@ public class MessageGriddlerController {
         }
         return HttpResponseEntity.response(success,"query",result);
     }
+
     /**
      * 中国地图
      */
@@ -500,7 +502,7 @@ public class MessageGriddlerController {
         List<MessageGriddler> messageGriddlerList = messageGriddlerMapper.selectList(queryWrapper.orderByDesc("aqi_level"));
         HashMap<String, Integer> maxAqiByProvince = new HashMap<>();
         for(MessageGriddler messageGriddler:messageGriddlerList){
-            Object data = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("data");
+            Object data = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("result");
             ObjectMapper objectMapper = new ObjectMapper();
             MessagePublic messagePublic = objectMapper.convertValue(data, MessagePublic.class);
             System.out.println(messagePublic);
@@ -536,7 +538,7 @@ public class MessageGriddlerController {
                 .collect(Collectors.toList());
         List<MessagePublic> messagePublicList = new ArrayList<>();
         for(String messagePublicId:messagePublicIds){
-            Object data = messagePublicFeignService.selectMessagePublic(messagePublicId).get("data");
+            Object data = messagePublicFeignService.selectMessagePublic(messagePublicId).get("result");
             ObjectMapper objectMapper = new ObjectMapper();
             MessagePublic messagePublic = objectMapper.convertValue(data, MessagePublic.class);
             messagePublicList.add(messagePublic);
@@ -562,8 +564,8 @@ filteredMessageGriddlerList.sort(Comparator.comparing(MessageGriddler::getAqiLev
         for(MessageGriddler messageGriddler: messageGriddlerList) {
             Object data = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("data");
             ObjectMapper objectMapper = new ObjectMapper();
-            MessagePublic messagePublic = objectMapper.convertValue(data, MessagePublic.class);
-            String city = citiesFeignService.selectCityName(messagePublic.getCityId());
+            MessagePublicPageDTO messagePublic = objectMapper.convertValue(data, MessagePublicPageDTO.class);
+            String city = citiesFeignService.selectCityName(messagePublic.getMessagePublic().getCityId());
             if(maxAqiByCity.containsKey(city)) {
                 if(messageGriddler.getAqiLevel()>maxAqiByCity.get(city)) {
                     maxAqiByCity.put(city,messageGriddler.getAqiLevel());
@@ -639,13 +641,13 @@ filteredMessageGriddlerList.sort(Comparator.comparing(MessageGriddler::getAqiLev
         for(MessageGriddler messageGriddler:messageGriddlerList) {
             Object data = messagePublicFeignService.selectMessagePublic(messageGriddler.getMessagePublicId()).get("data");
             ObjectMapper objectMapper = new ObjectMapper();
-            MessagePublic messagePublic = objectMapper.convertValue(data, MessagePublic.class);
+            MessagePublicPageDTO messagePublic = objectMapper.convertValue(data, MessagePublicPageDTO.class);
 
-            Object data1 = citiesFeignService.selectProvince(messagePublic.getProvinceId()).get("data");
+            Object data1 = citiesFeignService.selectProvince(messagePublic.getMessagePublic().getProvinceId()).get("data");
             ObjectMapper objectMapper1 = new ObjectMapper();
             Province province = objectMapper1.convertValue(data1, Province.class);
             province.getProvinceName();
-            PlaceDTO placeDTO = new PlaceDTO(province.getShortTitle(), province.getProvinceName(), citiesFeignService.selectCityName(messagePublic.getCityId()));
+            PlaceDTO placeDTO = new PlaceDTO(province.getShortTitle(), province.getProvinceName(), citiesFeignService.selectCityName(messagePublic.getMessagePublic().getCityId()));
             resultList.add(placeDTO);
         }
 
@@ -689,7 +691,7 @@ filteredMessageGriddlerList.sort(Comparator.comparing(MessageGriddler::getAqiLev
                     .collect(Collectors.toList());
             ArrayList<MessagePublic> messagePublicList = new ArrayList<>();
             for(String messagePublicId:messagePublicIds) {
-                Object data = messagePublicFeignService.selectMessagePublic(messagePublicId).get("data");
+                Object data = messagePublicFeignService.selectMessagePublic(messagePublicId).get("result");
                 ObjectMapper objectMapper = new ObjectMapper();
                 MessagePublic messagePublic = objectMapper.convertValue(data, MessagePublic.class);
                 messagePublicList.add(messagePublic);
