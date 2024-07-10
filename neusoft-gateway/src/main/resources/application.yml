@@ -8,7 +8,7 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: 127.0.0.1:8848 #nacos????
+        server-addr: 192.168.40.129:8848 #nacos????
     gateway:
       routes:
         - id: provider1 #??id,?????

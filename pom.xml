@@ -18,6 +18,7 @@
         <module>springcloud-policyMaker</module>
         <module>springcloud-griddler</module>
         <module>neusoft-gateway</module>
+        <module>springcloud-Base</module>
 <!--        <module>springcloud-user</module>-->
     </modules>
 
@@ -58,10 +59,22 @@
                 <artifactId>lombok</artifactId>
                 <version>1.18.24</version>
             </dependency>
+
         </dependencies>
     </dependencyManagement>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*.yml</include>
+                    <include>**/*.properties</include>
+                    <include>**/*.xml</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -80,4 +93,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

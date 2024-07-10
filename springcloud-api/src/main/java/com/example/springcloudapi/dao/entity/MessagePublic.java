@@ -40,6 +40,10 @@ public class MessagePublic {
      * 已指派：1
      */
     private int status;
+    /**
+     * 提交图片的地址
+     */
+    private String photo;
 
     public MessagePublic(String id, String publicId, String provinceId, String cityId, String address) {
         this.id = id;
@@ -47,5 +51,17 @@ public class MessagePublic {
         this.provinceId = provinceId;
         this.cityId = cityId;
         this.address = address;
+    }
+
+    public MessagePublic(String id, String publicId, String provinceId, String cityId, String address, int level, String description, Date date, int status) {
+        this.id = id;
+        this.publicId = publicId;
+        this.provinceId = provinceId;
+        this.cityId = cityId;
+        this.address = address;
+        this.level = level;
+        this.description = description;
+        this.date = date;
+        this.status = status;
     }
 }

@@ -13,6 +13,7 @@
         <option value="$PROJECT_DIR$/springcloud-griddler/pom.xml" />
         <option value="$PROJECT_DIR$/springcloud-policyMaker/pom.xml" />
         <option value="$PROJECT_DIR$/springcloud-manager/pom.xml" />
+        <option value="$PROJECT_DIR$/springcloud-Base/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

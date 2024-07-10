@@ -15,4 +15,5 @@ import java.util.Map;
  */
 public interface MessagePubilcService extends IService<MessagePublic> {
     public Map<String, Object> getPaginatedMessagePublics(int current, int size, QueryWrapper<MessagePublic> queryWrapper);
+
 }

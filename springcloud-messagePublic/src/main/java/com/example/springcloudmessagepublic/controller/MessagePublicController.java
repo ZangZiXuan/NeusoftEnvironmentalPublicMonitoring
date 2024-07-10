@@ -8,19 +8,22 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.springcloudapi.dao.dto.PlaceDTO;
 import com.example.springcloudapi.dao.entity.*;
 import com.example.springcloudapi.dao.dto.MessagePublicDTO;
-import com.example.springcloudapi.mapper.CityMapper;
-import com.example.springcloudapi.mapper.ProvinceMapper;
+//import com.example.springcloudmessagepublic.service.FileService;
+import com.example.springcloudmessagepublic.service.FileService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
 import com.example.springcloudapi.utils.HttpResponseEntity;
 import com.example.springcloudapi.utils.UUIDUtil;
-import com.example.springcloudmessagemanager.dto.ViewPageDTO;
-import com.example.springcloudmessagepublic.dto.DigitalMessagePublicDTO;
-import com.example.springcloudmessagepublic.dto.MessagePublicPageDTO;
-import com.example.springcloudmessagepublic.dto.ViewAllMessagePublicDataFrame;
+import com.example.springcloudapi.dao.dto.ViewPageDTO;
+import com.example.springcloudapi.dao.dto.DigitalMessagePublicDTO;
+import com.example.springcloudapi.dao.dto.MessagePublicPageDTO;
+import com.example.springcloudapi.dao.dto.ViewAllMessagePublicDataFrame;
 import com.example.springcloudmessagepublic.feign.CitiesFeignService;
 
 import com.example.springcloudmessagepublic.feign.MessageManagerFegnService;
 import com.example.springcloudmessagepublic.feign.PublicFeignService;
 import com.example.springcloudmessagepublic.mapper.MessagePublicMapper;
+//import com.example.springcloudmessagepublic.service.impl.FileServiceImpl;
 import com.example.springcloudmessagepublic.service.impl.MessagePublicServiceImpl;
 import com.example.springcloudmessagepublic.util.PaginationUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,7 +32,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -41,6 +46,7 @@ import java.util.stream.Collectors;
  * @Date 2024/6/16 9:59
  * @Version 1.0
  */
+@Slf4j
 @RestController
 @RequestMapping("/messagePublic")
 public class MessagePublicController {
@@ -50,6 +56,7 @@ public class MessagePublicController {
     CitiesFeignService citiesFeignService;
     @Autowired
     PublicFeignService publicFeignService;
+
 
     /**
      * 当已经分派的时候
@@ -75,16 +82,29 @@ public class MessagePublicController {
         return messagePublicIds;
     }
 
-    /**
-     * 公众监督员端的提交
-     * @param messagePublic
-     * @return Map
-     */
+
+//    @PostMapping("/handleFileUpload")
+//    public String handleFileUpload(@RequestParam("file") MultipartFile file) {
+//        String imageUrl = fileService.uploadImageToMinioAndSaveToDb(file);
+//        if (imageUrl != null) {
+//            return "Uploaded successfully. Image URL: " + imageUrl;
+//        } else {
+//            return "Failed to upload image.";
+//        }
+//    }
     @PostMapping("/submitMessagePublic")
-    public Map<String, Object> submitMessagePublic(@RequestBody MessagePublic messagePublic) {
+    public Map<String, Object> submitMessagePublic(@RequestParam("publicId") String pubicId
+            ,@RequestParam("provinceId") String provinceId,
+                                                   @RequestParam("cityId") String cityId,
+                                                   @RequestParam("address") String address,
+                                                   @RequestParam("level") Integer level,
+                                                   @RequestParam("description") String description,
+                                                   @RequestParam("date") Date date,
+                                                   @RequestParam("status") Integer status
+                                                   ,@RequestParam("file") MultipartFile file) {
+
         Map<String, Object> response = new HashMap<>();
-        messagePublic.setId(UUID.randomUUID().toString());
-        int insert = messagePublicMapper.insert(messagePublic);
+        int insert = fileService.uploadImageToMinioAndSaveToDb(pubicId, provinceId, cityId, address, level, description, date, status, file);
         if(insert == 1){
             response.put("success", true);
             response.put("message", "公众监督员端的提交添加成功");
@@ -106,7 +126,7 @@ public class MessagePublicController {
      */
 
     @GetMapping("/ViewMyMessagePublic/{publicId}")
-    public Map<String,Object> ViewMyMessagePublic(@PathVariable("publicId") String publicId) {
+    public Map<String,Object> ViewMyMessagePublic(@PathVariable("publicId") String publicId,@RequestParam("file") MultipartFile file) {
         Map<String, Object> response = new HashMap<>();
         Public publicById = publicFeignService.getPublicById(publicId);
         List<MessagePublic> messagePublicList = messagePublicMapper.selectList
@@ -127,6 +147,7 @@ public class MessagePublicController {
                 MessagePublicDTO messagePublicDTO = new MessagePublicDTO(
                         publicById,messagePublic,province.getProvinceName(),citiesFeignService.selectCityName(placeDTO.getCityId()), placeDTO.getShortTitle());
                 messagePublicDTOList.add(messagePublicDTO);
+
             }
             response.put("success", true);
             response.put("message", "查询当前公众监督员的提交记录成功");
@@ -281,6 +302,9 @@ public class MessagePublicController {
     @Autowired
     MessagePublicServiceImpl messagePublicService;
 
+    @Autowired
+    private FileService fileService;
+
 //    @GetMapping("/messagePublicPage/{current}/{size}")
 //    public Map<String, Object> messagePublicPage(@PathVariable("current") Integer current, @PathVariable("size") Integer size) {
 //        QueryWrapper<MessagePublic> queryWrapper = new QueryWrapper<>();
@@ -321,6 +345,41 @@ public class MessagePublicController {
         return messagePublicService.getPaginatedMessagePublics(current, size, queryWrapper);
     }
 
+
+
+
+    /**
+     *
+     * @param messageId
+     * 注意这里面是所有的id，（唯一识别符号）
+     * @return
+     */
+    @PostMapping("/selectMessagePublicPhoto")
+    public ResponseEntity<Map<String,Object>> selectMessagePublicPhoto(@RequestParam("messageId") String messageId) {
+        HashMap<String, Object> response = new HashMap<>();
+        List<MessagePublic> messagePublics = messagePublicMapper.selectList(
+                Wrappers.<MessagePublic>lambdaQuery().eq(MessagePublic::getId, messageId));
+        try{
+
+            System.out.println("FileController.getTaskChildPhoto:获取作业图片成功");
+            System.out.println();
+            MessagePublic messagePublic = messagePublics.get(0);
+            Public aPublic = publicFeignService.getPublicById(messagePublic.getPublicId());
+            MessagePublicPageDTO messagePublicPageDTO = new MessagePublicPageDTO(aPublic,messagePublic);
+            response.put("success", true);
+            response.put("message", "某个id的公众监督员记录");
+            response.put("data",messagePublicPageDTO);
+            response.put("result",messagePublic);
+            return ResponseEntity.ok(response);
+        }catch (Exception e){
+            response.put("success", false);
+            response.put("message", "当前用户还未提交过反馈信息");
+            response.put("data",null);
+            response.put("result",null);
+            //返回 400 Bad Request 表示请求不合法.(待推敲哪个状态码更合适)
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
 
     /**
      *

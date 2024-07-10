@@ -8,20 +8,19 @@ import com.example.springcloudapi.dao.dto.AQIDTO;
 import com.example.springcloudapi.dao.dto.PlaceDTO;
 import com.example.springcloudapi.dao.entity.*;
 import com.example.springcloudapi.dao.dto.MessageGriddlerDTO;
-import com.example.springcloudapi.mapper.ProvinceMapper;
-import com.example.springcloudapi.utils.CommUtil;
+
 import com.example.springcloudapi.utils.HttpResponseEntity;
-import com.example.springcloudmessagegriddler.dto.AQIViewDetailsDTO;
-import com.example.springcloudmessagegriddler.dto.DigitalScreenMessageGriddler;
-import com.example.springcloudmessagegriddler.dto.MessageGriddlerViewDTO;
+import com.example.springcloudapi.dao.dto.AQIViewDetailsDTO;
+import com.example.springcloudapi.dao.dto.DigitalScreenMessageGriddler;
+import com.example.springcloudapi.dao.dto.MessageGriddlerViewDTO;
 import com.example.springcloudmessagegriddler.feign.*;
 import com.example.springcloudmessagegriddler.service.MessageGriddlerService;
-import com.example.springcloudmessagepublic.dto.MessagePublicPageDTO;
+import com.example.springcloudapi.dao.dto.MessagePublicPageDTO;
 import com.example.springcloudmessagegriddler.mapper.MessageGriddlerMapper;
 
 import com.example.springcloudmessagegriddler.service.AQIService;
 //import com.example.springcloudmessagepublic.dto.messagePublicPageDTO;
-import com.example.springcloudmessagepublic.mapper.MessagePublicMapper;
+//import com.example.springcloudmessagepublic.mapper.MessagePublicMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import jakarta.persistence.criteria.CriteriaBuilder;

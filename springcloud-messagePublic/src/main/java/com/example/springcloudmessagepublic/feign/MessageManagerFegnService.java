@@ -1,6 +1,6 @@
 package com.example.springcloudmessagepublic.feign;
 
-import com.example.springcloudmessagemanager.dto.ViewPageDTO;
+import com.example.springcloudapi.dao.dto.ViewPageDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;

@@ -18,17 +18,18 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>com.example</groupId>
-            <artifactId>springcloud-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+
+
         <!-- 引入web工程 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>springcloud-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId> com.alibaba.cloud </groupId>
             <artifactId> spring-cloud-starter-alibaba-nacos-discovery </artifactId>
@@ -76,24 +77,24 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.9</version>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+<!--                &lt;!&ndash; 解决没有main函数报错unable to find main class 的问题&ndash;&gt;-->
                 <executions>
                     <execution>
-                        <id>default-prepare-agent</id>
                         <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>default-report</id>
-                        <goals>
-                            <goal>report</goal>
+                            <goal>repackage</goal>
                         </goals>
                     </execution>
                 </executions>
+                <!--打成可被依赖jar结构-->
+                <configuration>
+                    <mainClass>com.example.springcloudmessagemanager.SpringcloudMessageManagerApplication
+                    </mainClass>
+
+                </configuration>
             </plugin>
+
         </plugins>
     </build>
 </project>

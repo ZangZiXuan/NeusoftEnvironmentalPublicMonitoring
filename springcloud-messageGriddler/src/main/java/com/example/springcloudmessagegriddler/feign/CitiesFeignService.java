@@ -13,7 +13,7 @@ import java.util.Map;
  * @Date 2024/6/26 15:08
  * @Version 1.0
  */
-@FeignClient(name = "springcloud-api",url = "localhost:8081")
+@FeignClient(name = "springcloud-Base",url = "localhost:8081")
 public interface CitiesFeignService {
     @PostMapping("/city/selectCity")
     public Map<String,Object> selectCity(@RequestBody String cityId);

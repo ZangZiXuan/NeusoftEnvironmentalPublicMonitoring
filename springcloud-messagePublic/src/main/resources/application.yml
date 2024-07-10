@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/nep?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
+    url: jdbc:mysql://192.168.40.129:3306/nep?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -16,5 +16,20 @@ spring:
     testOnBorrow: false
     testOnReturn: false
     poolPreparedStatements: true
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.40.129:8848
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
 server:
   port: 8087
+
+# minio配置
+minio:
+  endpoint: http://192.168.40.129:19000 #Minio服务所在地址
+  bucketName: nep   #存储桶名称/图片要存放的文件夹名称
+  accessKey: minioadmin   #访问的key/账号
+  secretKey: minioadmin   #访问的秘钥/密码

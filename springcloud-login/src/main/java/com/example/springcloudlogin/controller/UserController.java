@@ -1,29 +1,14 @@
 package com.example.springcloudlogin.controller;
 
-/**
- * @Author Zang Xinrui
- * @Description TODO
- * @Date 2024/6/15 20:31
- * @Version 1.0
- */
-
 import com.example.springcloudapi.dao.dto.Dept;
 import com.example.springcloudapi.dao.dto.LoginDTO;
-import com.example.springcloudapi.dao.entity.Griddler;
-import com.example.springcloudapi.dao.entity.Manager;
-import com.example.springcloudapi.dao.entity.PolicyMaker;
-import com.example.springcloudapi.dao.entity.Public;
 import com.example.springcloudlogin.feign.GriddlerFeignService;
 import com.example.springcloudlogin.feign.ManagerFeignService;
 import com.example.springcloudlogin.feign.PolicyMakerFeignService;
 import com.example.springcloudlogin.feign.PublicFeignService;
-import com.example.springcloudlogin.service.UserService;
-import com.example.springcloudapi.utils.MD5Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-//import org.springframework.security.core.AuthenticationException;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -42,6 +27,7 @@ public class UserController {
     PublicFeignService publicFeignService;
     @Autowired
     PolicyMakerFeignService policyMakerFeignService;
+
     @PostMapping("/login")
     public Map<String,Object> login(@RequestBody LoginDTO loginDTO) {
         HashMap<String, Object> response = new HashMap<>();
@@ -78,12 +64,12 @@ public class UserController {
             dept.setUser(data);
         }
 
-        if(dept.getDname()!= "public" &&  dept.getDname()!= "policyMaker"
-        && dept.getDname()!= "manager" && dept.getDname()!= "griddler") {
+        if(dept.getDname()!= "public" && dept.getDname()!= "policyMaker"
+                && dept.getDname()!= "manager" && dept.getDname()!= "griddler") {
             response.put("message","账号或密码错误");
             response.put("success",false);
             response.put("data",null);
-            //返回 400 Bad Request 表示请求不合法.(待推敲哪个状态码更合适)
+//返回 400 Bad Request 表示请求不合法.(待推敲哪个状态码更合适)
             return response;
         }else {
             response.put("data",dept);
